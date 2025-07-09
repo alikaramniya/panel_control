@@ -204,7 +204,7 @@
                 <!-- User items will be dynamically handled but kept for initial view -->
                 @foreach ($users as $user)
                     <li class="user-list-item active" data-id="user1">
-                        <img src="https://i.pravatar.cc/150?img=68" alt="Avatar" class="user-avatar">
+                        <img src="{{ asset('user-icon.jpg') }}" alt="Avatar" class="user-avatar">
                         <div class="user-info">
                             <div class="user-name">علی رضایی</div>
                             <div class="user-email">ali.rezaei@example.com</div>
@@ -220,7 +220,7 @@
             <div class="profile-view">
                 <header class="profile-header">
                     <div class="profile-picture-container">
-                        <img src="https://i.pravatar.cc/150?u=nima" alt="Profile Picture" class="profile-picture" id="profile-img">
+                        <img src="{{ asset('user-icon.jpg') }}" alt="Profile Picture" class="profile-picture" id="profile-img">
                         <div class="picture-overlay">
                             <i class="fa-solid fa-camera" title="تغییر عکس"></i>
                             <i class="fa-solid fa-trash-can" title="حذف عکس"></i>
