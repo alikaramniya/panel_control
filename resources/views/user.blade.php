@@ -263,9 +263,9 @@
                             <td data-label="نام فایل" class="file-name">{{ $document->file_name }}</td>
                             <td data-label="تاریخ ارسال">۱۸ تیر ۱۴۰۴</td>
                             <td data-label="عملیات" class="actions">
-                                <a href="/{{ $document->file }}" class="download-btn" download><i class="fas fa-download"></i>
+                                <a href="{{ route('document.download', $document->id) }}" class="download-btn" ><i class="fas fa-download"></i>
                                     دانلود</a>
-                                <a href="/{{ $document->file }}" class="print-btn" onclick="window.print(); return false;"><i
+                                <a href="{{ $document->file }}" class="print-btn" onclick="window.print(); return false;"><i
                                         class="fas fa-print"></i> پرینت</a>
                             </td>
                         </tr>

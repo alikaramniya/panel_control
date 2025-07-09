@@ -8,6 +8,9 @@ use App\Models\Document;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class DocumentController extends Controller
 {
@@ -45,7 +48,7 @@ class DocumentController extends Controller
             Document::create([
                 'user_id' => (int)$request->user_id,
                 'file_type' => $fileType,
-                'file' => 'public/' . $path,
+                'file' => $path,
                 'file_name' => $request->file_name,
                 'file_date_upload' => now()
             ]);
@@ -93,5 +96,14 @@ class DocumentController extends Controller
         $user = User::with('documents')->find($request->input('id'));
 
         return view('user', compact('user'));
+    }
+
+    public function download(Document $document)
+    {
+        $file = Str::replaceFirst('public', 'storage/public', $document->file);
+
+        if (Storage::exists($file)) {
+            return Storage::download($file);
+        }
     }
 }

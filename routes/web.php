@@ -14,6 +14,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/user', [UserController::class, 'user'])->name('profile.user');
     Route::post('/document/send', [DocumentController::class, 'store'])->name('user.document.send');
     Route::get('/document/list', [DocumentController::class, 'listDocument'])->name('document.list');
+    Route::get('/document/download/{document}', [DocumentController::class, 'download'])->name('document.download');
     /* Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit'); */
     /* Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update'); */
     /* Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); */
