@@ -195,34 +195,22 @@
         <!-- User Selection Panel (Right) -->
         <div class="user-panel">
              <div class="user-panel-header">
-                <button class="create-user-btn"><i class="fa-solid fa-plus"></i>ساخت کاربر جدید</button>
+                <button class="create-user-btn" data-href="{{ route('user.create') }}"><i class="fa-solid fa-plus"></i>ساخت کاربر جدید</button>
             </div>
             <div class="search-bar">
                 <input type="text" placeholder="جستجوی کاربر...">
             </div>
             <ul class="user-list">
                 <!-- User items will be dynamically handled but kept for initial view -->
-                <li class="user-list-item active" data-id="user1">
-                    <img src="https://i.pravatar.cc/150?img=68" alt="Avatar" class="user-avatar">
-                    <div class="user-info">
-                        <div class="user-name">علی رضایی</div>
-                        <div class="user-email">ali.rezaei@example.com</div>
-                    </div>
-                </li>
-                <li class="user-list-item" data-id="user2">
-                    <img src="https://i.pravatar.cc/150?img=47" alt="Avatar" class="user-avatar">
-                    <div class="user-info">
-                        <div class="user-name">سارا محمدی</div>
-                        <div class="user-email">sara.mohammadi@example.com</div>
-                    </div>
-                </li>
-                <li class="user-list-item" data-id="user3">
-                    <img src="https://i.pravatar.cc/150?u=nima" alt="Avatar" class="user-avatar">
-                    <div class="user-info">
-                        <div class="user-name">نیما احمدی</div>
-                        <div class="user-email">nima.ahmadi@example.com</div>
-                    </div>
-                </li>
+                @foreach ($users as $user)
+                    <li class="user-list-item active" data-id="user1">
+                        <img src="https://i.pravatar.cc/150?img=68" alt="Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <div class="user-name">علی رضایی</div>
+                            <div class="user-email">ali.rezaei@example.com</div>
+                        </div>
+                    </li>
+                @endforeach
             </ul>
         </div>
 
@@ -287,5 +275,13 @@
         </div>
     </div>
 
+    <script charset="utf-8">
+        const createNewUser = document.querySelector('.create-user-btn');
+
+        createNewUser.addEventListener('click', function() {
+            console.log('button clicked');
+            location.href = createNewUser.dataset.href;
+        });
+    </script>
 </body>
 </html>

@@ -22,4 +22,9 @@ class UserController extends Controller
 
         return view('pannel', compact('users'));
     }
+
+    public function create()
+    {
+        return view('create_user');
+    }
 }

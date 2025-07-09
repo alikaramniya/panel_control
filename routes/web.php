@@ -9,6 +9,7 @@ Route::get('/', [UserController::class, 'index'])->middleware('auth')->name('hom
 Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/create', [UserController::class, 'create'])->name('user.create');
     Route::get('/user/{users}', [UserController::class, 'user'])->name('profile.user');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
