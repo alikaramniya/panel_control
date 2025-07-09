@@ -23,4 +23,11 @@ class Document extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    protected function casts(): array
+    {
+        return [
+            'file_date_upload' => 'datetime',
+        ];
+    }
 }

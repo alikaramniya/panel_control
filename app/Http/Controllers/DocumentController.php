@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDocumentRequest;
 use App\Http\Requests\UpdateDocumentRequest;
 use App\Models\Document;
+use App\Models\User;
+use Exception;
+use Illuminate\Http\Request;
 
 class DocumentController extends Controller
 {
@@ -29,7 +32,28 @@ class DocumentController extends Controller
      */
     public function store(StoreDocumentRequest $request)
     {
-        //
+        try {
+            $path = $request->file->store('document');
+
+            $extension = $request->file->getClientOriginalExtension();
+
+            $fileType = 'pdf';
+            if ($extension !== 'pdf') {
+                $fileType = 'file';
+            }
+
+            Document::create([
+                'user_id' => (int)$request->user_id,
+                'file_type' => $fileType,
+                'file' => 'public/' . $path,
+                'file_name' => $request->file_name,
+                'file_date_upload' => now()
+            ]);
+
+            return response()->json(['success' => 'عملیات ذخیره سازی با موفقیت انجام شد']);
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -62,5 +86,12 @@ class DocumentController extends Controller
     public function destroy(Document $document)
     {
         //
+    }
+
+    public function listDocument(Request $request)
+    {
+        $user = User::with('documents')->find($request->input('id'));
+
+        return view('user', compact('user'));
     }
 }

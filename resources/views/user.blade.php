@@ -69,14 +69,14 @@
             color: var(--text-secondary-color);
             font-size: 1rem;
         }
-        
+
         .user-info {
             display: flex;
             align-items: center;
         }
-        
+
         .user-info .username {
-             margin-left: 1rem;
+            margin-left: 1rem;
         }
 
         .user-info img {
@@ -85,7 +85,7 @@
             border-radius: 50%;
             object-fit: cover;
         }
-        
+
         .logout-btn {
             background: none;
             border: 1px solid #ff4d4d;
@@ -97,7 +97,7 @@
             transition: all 0.3s ease;
             margin-right: 2rem;
         }
-        
+
         .logout-btn:hover {
             background-color: #ff4d4d;
             color: white;
@@ -108,14 +108,15 @@
             font-size: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        
+
         .file-table {
             width: 100%;
             border-collapse: collapse;
             text-align: right;
         }
 
-        .file-table th, .file-table td {
+        .file-table th,
+        .file-table td {
             padding: 1.2rem 1rem;
             border-bottom: 1px solid var(--border-color);
         }
@@ -135,13 +136,20 @@
             font-size: 1.8rem;
             vertical-align: middle;
         }
-        .file-icon.pdf { color: var(--pdf-color); }
-        .file-icon.image { color: var(--image-color); }
-        
+
+        .file-icon.pdf {
+            color: var(--pdf-color);
+        }
+
+        .file-icon.image {
+            color: var(--image-color);
+        }
+
         .file-name {
             font-weight: 500;
         }
-/* Action Buttons */
+
+        /* Action Buttons */
         .actions a {
             display: inline-block;
             text-decoration: none;
@@ -152,7 +160,7 @@
             font-size: 0.9rem;
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
-        
+
         .actions a:hover {
             opacity: 0.85;
             transform: translateY(-2px);
@@ -161,23 +169,38 @@
         .actions .download-btn {
             background-color: var(--primary-color);
         }
-        
+
         .actions .print-btn {
             background-color: #2ecc71;
         }
-        
+
         .actions i {
             margin-left: 6px;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
-            body { padding: 1rem; }
-            .user-dashboard { padding: 1.5rem; }
-            .dashboard-header { flex-direction: column; align-items: flex-start; }
-            .user-info { margin-top: 1rem; }
-            
-            .file-table thead { display: none; }
+            body {
+                padding: 1rem;
+            }
+
+            .user-dashboard {
+                padding: 1.5rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .user-info {
+                margin-top: 1rem;
+            }
+
+            .file-table thead {
+                display: none;
+            }
+
             .file-table tr {
                 display: block;
                 border: 1px solid var(--border-color);
@@ -185,6 +208,7 @@
                 margin-bottom: 1rem;
                 padding: 1rem;
             }
+
             .file-table td {
                 display: flex;
                 justify-content: space-between;
@@ -192,11 +216,13 @@
                 padding: 0.8rem 0;
                 border: none;
             }
+
             .file-table td::before {
                 content: attr(data-label);
                 font-weight: 500;
                 color: var(--text-secondary-color);
             }
+
             .file-table td.actions {
                 justify-content: center;
                 margin-top: 1rem;
@@ -209,13 +235,13 @@
     <div class="user-dashboard">
         <header class="dashboard-header">
             <div class="welcome-message">
-                <h1>سلام، مریم حسینی!</h1>
+                <h1>سلام، {{ $user->name }}!</h1>
                 <p>فایل‌هایی که تاکنون از طرف مدیریت دریافت کرده‌اید:</p>
             </div>
             <div class="user-info">
-                 <button class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
-                 <span class="username">MaryamH</span>
-                 <img src="https://i.pravatar.cc/150?img=32" alt="User Avatar">
+                <button class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
+                <span class="username">{{ $user->username }}</span>
+                <img src="https://i.pravatar.cc/150?img=32" alt="User Avatar">
             </div>
         </header>
 
@@ -231,42 +257,46 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td data-label="نوع"><i class="fas fa-file-pdf file-icon pdf"></i></td>
-                        <td data-label="نام فایل" class="file-name">گزارش عملکرد سه ماهه اول.pdf</td>
-                        <td data-label="تاریخ ارسال">۱۸ تیر ۱۴۰۴</td>
-                        <td data-label="عملیات" class="actions">
-                            <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a>
-                            <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-label="نوع"><i class="fas fa-file-image file-icon image"></i></td>
-                        <td data-label="نام فایل" class="file-name">نمودار فروش ماهانه.png</td>
-                        <td data-label="تاریخ ارسال">۱۵ تیر ۱۴۰۴</td>
-                        <td data-label="عملیات" class="actions">
-						<a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a>
-                            <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td data-label="نوع"><i class="fas fa-file-pdf file-icon pdf"></i></td>
-                        <td data-label="نام فایل" class="file-name">قرارداد همکاری.pdf</td>
-                        <td data-label="تاریخ ارسال">۰۲ تیر ۱۴۰۴</td>
-                        <td data-label="عملیات" class="actions">
-                            <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a>
-                            <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a>
-                        </td>
-                    </tr>
-                     <tr>
-                        <td data-label="نوع"><i class="fas fa-file-image file-icon image"></i></td>
-                        <td data-label="نام فایل" class="file-name">پوستر همایش سالانه.jpg</td>
-                        <td data-label="تاریخ ارسال">۲۵ خرداد ۱۴۰۴</td>
-                        <td data-label="عملیات" class="actions">
-                            <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a>
-                            <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a>
-                        </td>
-                    </tr>
+                    @foreach ($user->documents as $document)
+                        <tr>
+                            <td data-label="نوع"><i class="fas file-icon {{ $document->file_type === 'file' ? 'image fa-file-image' : 'pdf fa-file-pdf' }}"></i></td>
+                            <td data-label="نام فایل" class="file-name">{{ $document->file_name }}</td>
+                            <td data-label="تاریخ ارسال">۱۸ تیر ۱۴۰۴</td>
+                            <td data-label="عملیات" class="actions">
+                                <a href="/{{ $document->file }}" class="download-btn" download><i class="fas fa-download"></i>
+                                    دانلود</a>
+                                <a href="/{{ $document->file }}" class="print-btn" onclick="window.print(); return false;"><i
+                                        class="fas fa-print"></i> پرینت</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    {{-- <tr> --}}
+                    {{--     <td data-label="نوع"><i class="fas fa-file-image file-icon image"></i></td> --}}
+                    {{--     <td data-label="نام فایل" class="file-name">نمودار فروش ماهانه.png</td> --}}
+                    {{--     <td data-label="تاریخ ارسال">۱۵ تیر ۱۴۰۴</td> --}}
+                    {{--     <td data-label="عملیات" class="actions"> --}}
+                    {{-- <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a> --}}
+                    {{--         <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a> --}}
+                    {{--     </td> --}}
+                    {{-- </tr> --}}
+                    {{-- <tr> --}}
+                    {{--     <td data-label="نوع"><i class="fas fa-file-pdf file-icon pdf"></i></td> --}}
+                    {{--     <td data-label="نام فایل" class="file-name">قرارداد همکاری.pdf</td> --}}
+                    {{--     <td data-label="تاریخ ارسال">۰۲ تیر ۱۴۰۴</td> --}}
+                    {{--     <td data-label="عملیات" class="actions"> --}}
+                    {{--         <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a> --}}
+                    {{--         <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a> --}}
+                    {{--     </td> --}}
+                    {{-- </tr> --}}
+                    {{--  <tr> --}}
+                    {{--     <td data-label="نوع"><i class="fas fa-file-image file-icon image"></i></td> --}}
+                    {{--     <td data-label="نام فایل" class="file-name">پوستر همایش سالانه.jpg</td> --}}
+                    {{--     <td data-label="تاریخ ارسال">۲۵ خرداد ۱۴۰۴</td> --}}
+                    {{--     <td data-label="عملیات" class="actions"> --}}
+                    {{--         <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a> --}}
+                    {{--         <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a> --}}
+                    {{--     </td> --}}
+                    {{-- </tr> --}}
                 </tbody>
             </table>
         </main>
@@ -274,3 +304,4 @@
 
 </body>
 </html>
+
