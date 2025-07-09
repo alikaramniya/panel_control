@@ -8,7 +8,6 @@ use App\Models\Document;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -60,14 +59,6 @@ class DocumentController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Document $document)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Document $document)
@@ -104,6 +95,19 @@ class DocumentController extends Controller
 
         if (Storage::exists($file)) {
             return Storage::download($file);
+        }
+    }
+
+    public function show(Document $document)
+    {
+        $file = Str::replaceFirst('public', 'storage/public', $document->file);
+
+        if (Storage::exists($file)) {
+            if ($document->file_type === 'file') {
+                return "<img src='/storage/$file' />" ;
+            }
+
+            return '/storage/' . $file;
         }
     }
 }

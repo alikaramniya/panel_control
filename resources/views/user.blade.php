@@ -231,6 +231,9 @@
     </style>
 </head>
 <body>
+    @empty ($user)
+        @php($user = auth()->user()->load('documents'))
+    @endempty
 
     <div class="user-dashboard">
         <header class="dashboard-header">
@@ -241,7 +244,7 @@
             <div class="user-info">
                 <button class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
                 <span class="username">{{ $user->username }}</span>
-                <img src="https://i.pravatar.cc/150?img=32" alt="User Avatar">
+                <img src="{{ asset('user-icon.jpg') }}" alt="User Avatar">
             </div>
         </header>
 
@@ -256,52 +259,46 @@
                         <th>عملیات</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="buttons">
                     @foreach ($user->documents as $document)
                         <tr>
-                            <td data-label="نوع"><i class="fas file-icon {{ $document->file_type === 'file' ? 'image fa-file-image' : 'pdf fa-file-pdf' }}"></i></td>
+                            <td data-label="نوع"><i
+                                    class="fas file-icon {{ $document->file_type === 'file' ? 'image fa-file-image' : 'pdf fa-file-pdf' }}"></i>
+                            </td>
                             <td data-label="نام فایل" class="file-name">{{ $document->file_name }}</td>
                             <td data-label="تاریخ ارسال">۱۸ تیر ۱۴۰۴</td>
                             <td data-label="عملیات" class="actions">
-                                <a href="{{ route('document.download', $document->id) }}" class="download-btn" ><i class="fas fa-download"></i>
+                                <a href="{{ route('document.download', $document->id) }}" class="download-btn"
+                                    class="fas fa-download"></i>
                                     دانلود</a>
-                                <a href="{{ $document->file }}" class="print-btn" onclick="window.print(); return false;"><i
-                                        class="fas fa-print"></i> پرینت</a>
+                                <a href="#"
+                                    data-url="
+                                      @if ($document->file_type !== 'pdf') {{ route('document.show', $document->id) }}
+                                      @else
+                                          {{ '/storage/' . $document->file }} @endif
+                                      "
+                                    class="print-btn"><i class="fas fa-print"></i> پرینت</a>
                             </td>
                         </tr>
                     @endforeach
-                    {{-- <tr> --}}
-                    {{--     <td data-label="نوع"><i class="fas fa-file-image file-icon image"></i></td> --}}
-                    {{--     <td data-label="نام فایل" class="file-name">نمودار فروش ماهانه.png</td> --}}
-                    {{--     <td data-label="تاریخ ارسال">۱۵ تیر ۱۴۰۴</td> --}}
-                    {{--     <td data-label="عملیات" class="actions"> --}}
-                    {{-- <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a> --}}
-                    {{--         <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a> --}}
-                    {{--     </td> --}}
-                    {{-- </tr> --}}
-                    {{-- <tr> --}}
-                    {{--     <td data-label="نوع"><i class="fas fa-file-pdf file-icon pdf"></i></td> --}}
-                    {{--     <td data-label="نام فایل" class="file-name">قرارداد همکاری.pdf</td> --}}
-                    {{--     <td data-label="تاریخ ارسال">۰۲ تیر ۱۴۰۴</td> --}}
-                    {{--     <td data-label="عملیات" class="actions"> --}}
-                    {{--         <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a> --}}
-                    {{--         <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a> --}}
-                    {{--     </td> --}}
-                    {{-- </tr> --}}
-                    {{--  <tr> --}}
-                    {{--     <td data-label="نوع"><i class="fas fa-file-image file-icon image"></i></td> --}}
-                    {{--     <td data-label="نام فایل" class="file-name">پوستر همایش سالانه.jpg</td> --}}
-                    {{--     <td data-label="تاریخ ارسال">۲۵ خرداد ۱۴۰۴</td> --}}
-                    {{--     <td data-label="عملیات" class="actions"> --}}
-                    {{--         <a href="#" class="download-btn" download><i class="fas fa-download"></i> دانلود</a> --}}
-                    {{--         <a href="#" class="print-btn" onclick="window.print(); return false;"><i class="fas fa-print"></i> پرینت</a> --}}
-                    {{--     </td> --}}
-                    {{-- </tr> --}}
                 </tbody>
             </table>
         </main>
     </div>
+    <script>
+        const buttons = document.getElementById('buttons');
 
+        buttons.addEventListener('click', function(e) {
+            if (e.target.classList.contains('print-btn')) {
+                const fileUrl = e.target.dataset.url;
+
+                const win = window.open(fileUrl, '_blank');
+                win.focus();
+                win.onload = () => {
+                    win.print();
+                };
+            }
+        })
+    </script>
 </body>
 </html>
-
