@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('file_type');
+            $table->string('file');
+            $table->string('file_name');
+            $table->datetime('file_date_upload');
             $table->timestamps();
         });
     }
