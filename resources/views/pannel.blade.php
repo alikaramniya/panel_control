@@ -495,6 +495,7 @@
                         <span id="password-info"></span>
                     </div>
                 </div>
+                <span id="formInfo"></span>
                 <form id="send-document" method="POST" enctype="multipart/form-data"
                     action="{{ route('user.document.send') }}">
                     <input type="hidden" value="" name="user_id" />

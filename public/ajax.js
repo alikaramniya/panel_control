@@ -6,6 +6,7 @@ const profilePlaceholder = document.querySelector('.profile-placeholder');
 const userList = document.querySelector('.user-list');
 const formSendDocument = document.getElementById('send-document');
 const listDocumentUser = document.getElementById('listDocumentUser');
+const formInfo = document.getElementById('formInfo');
 
 const passwordInput = document.querySelector('input[name="password"]');
 const passwordInfo = passwordInput.nextElementSibling;
@@ -94,9 +95,16 @@ function sendFormDocumentData(data, url) {
 
         xhr.addEventListener('load', function () {
             if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
-                let res = xhr.responseText;
+                let res = JSON.parse(xhr.responseText);
 
-                console.log(res);
+
+                if (res.status === 'success') {
+                    console.log(res);
+                    formInfo.innerHTML = `<i style="color:green">${res.message}</i>`;
+                } else if (res.status === 'error') {
+                    formInfo.innerHTML = `<i style="color:red">${res.message}</i>`;
+                }
+                setTimeout(() => formInfo.innerHTML = "", 3000);
             } else {
                 console.log(xhr.status);
             }

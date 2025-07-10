@@ -9,6 +9,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -55,9 +56,17 @@ class DocumentController extends Controller
                 'file_date_upload' => now()
             ]);
 
-            return response()->json(['success' => 'عملیات ذخیره سازی با موفقیت انجام شد']);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'عملیات ذخیره سازی با موفقیت انجام شد'
+            ]);
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()]);
+            Log::error('Add new document error: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'در اضافه کردن سند جدید مشگلی پیش آمده'
+            ]);
         }
     }
 
