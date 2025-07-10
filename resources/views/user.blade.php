@@ -256,6 +256,26 @@
                         'color:red;border-color:red' => !$isAdmin,
                         'color:green;border-color:green' => $isAdmin,
                     ]) href="{{ route('user.toggle.role', $user) }}">ادمین</a>
+                    @can('canDeleteUser', $user)
+                        &nbsp;
+                        <a class="dashboard-btn" id="deleteUser" style="color:orange;border-color:orange">حذف کاربر</a>
+                        <script>
+                            const deleteUser = document.getElementById('deleteUser');
+                            let state = 0;
+                            deleteUser.addEventListener('click', function() {
+                                this.innerHTML = 'مطمعنی؟';
+                                if (state === 1) {
+                                    this.href= "{{ route('user.delete', $user) }}"
+                                }
+                                setTimeout(() => {
+                                    this.innerHTML = 'حذف کاربر';
+                                    this.href="#";
+                                    state = 0;
+                                }, 2000);
+                                state = 1;
+                            }) 
+                        </script>
+                    @endcan
                     &nbsp;
                     <a class="dashboard-btn" href="{{ route('dashboard') }}">پنل</a>
                 @endcan

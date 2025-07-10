@@ -13,6 +13,7 @@ Route::middleware(['can:isAdmin', 'auth'])->prefix('user')->controller(UserContr
     Route::get('/search', 'search')->name('user.search');
     Route::get('/toggle/{user}', 'toggle')->name('user.toggle.role');
     Route::get('/create', 'create')->name('user.create');
+    Route::get('/delete/{user}', 'delete')->name('user.delete');
     Route::post('/store', 'store')->name('user.store');
     Route::get('/update', 'updatePassword')->name('user.update.password');
     Route::get('/user', 'user')->name('profile.user');

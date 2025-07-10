@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -126,5 +127,40 @@ class UserController extends Controller
         $user->save();
 
         return back();
+    }
+    public function delete(User $user)
+    {
+        if ($user->role === 'super_admin') {
+            return back();
+        }
+
+        if (auth()->user()->role === 'admin' && $user->role === 'admin') {
+            return back();
+        }
+
+        $documents = $user->documents;
+
+        $this->deleteFileAndFolder($documents) ;
+
+        $user->delete();
+
+        return to_route('dashboard');
+    }
+
+    public function deleteFileAndFolder($documents)
+    {
+        foreach ($documents as $document) {
+            $file = $document->file;
+
+            if (Storage::exists($file)) {
+                Storage::delete($file);
+            }
+
+            $dirParent = dirname(Storage::path($file));
+
+            if (count(scandir($dirParent)) <= 2) {
+                Storage::deleteDirectory(dirname($file));
+            }
+        }
     }
 }
