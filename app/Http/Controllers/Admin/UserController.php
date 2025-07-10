@@ -23,13 +23,17 @@ class UserController extends Controller
 
     public function dashboard()
     {
-        if (auth()->user()->role === 'user') {
-            return view('user');
+        try {
+            if (auth()->user()->role === 'user') {
+                return view('user');
+            }
+
+            $users = User::latest()->simplePaginate(10);
+
+            return view('pannel', compact('users'));
+        } catch (Exception $e) {
+            Log::error('خطایی در گرفتن کاربران پیش آمده' . ' ' . $e->getMessage());
         }
-
-        $users = User::latest()->simplePaginate(10);
-
-        return view('pannel', compact('users'));
     }
 
     public function create()
@@ -114,53 +118,66 @@ class UserController extends Controller
 
     public function toggle(User $user)
     {
-        if (auth()->user()->role !== 'super_admin') {
+        try {
+            if (auth()->user()->role !== 'super_admin') {
+                return back();
+            }
+
+            if ($user->role === 'super_admin') {
+                return back();
+            }
+
+            $user->role = $user->role === 'admin' ? 'user' : 'admin';
+
+            $user->save();
+
             return back();
+        } catch (Exception $e) {
+            Log::error('خطایی در تغییر وضعیت کاربر پیش آمده ' . $e->getMessage());
         }
-
-        if ($user->role === 'super_admin') {
-            return back();
-        }
-
-        $user->role = $user->role === 'admin' ? 'user' : 'admin';
-
-        $user->save();
-
-        return back();
     }
+
     public function delete(User $user)
     {
-        if ($user->role === 'super_admin') {
-            return back();
+        try {
+            if ($user->role === 'super_admin') {
+                return back();
+            }
+
+            if (auth()->user()->role === 'admin' && $user->role === 'admin') {
+                return back();
+            }
+
+            $documents = $user->documents;
+
+            $this->deleteFileAndFolder($documents) ;
+
+            $user->delete();
+
+            return to_route('dashboard');
+        } catch (Exception $e) {
+            Log::error('خطایی در حذف کاربر پیش آمده' . ' ' . $e->getMessage());
         }
-
-        if (auth()->user()->role === 'admin' && $user->role === 'admin') {
-            return back();
-        }
-
-        $documents = $user->documents;
-
-        $this->deleteFileAndFolder($documents) ;
-
-        $user->delete();
-
-        return to_route('dashboard');
     }
 
     public function deleteFileAndFolder($documents)
     {
-        foreach ($documents as $document) {
-            $file = $document->file;
+        try {
+            foreach ($documents as $document) {
+                $file = $document->file;
 
-            if (Storage::exists($file)) {
-                Storage::delete($file);
+                if (Storage::exists($file)) {
+                    Storage::delete($file);
+                }
+
+                $dirParent = dirname(Storage::path($file));
+
+                if (count(scandir($dirParent)) <= 2) {
+                    Storage::deleteDirectory(dirname($file));
+                }
             }
-
-            $dirParent = dirname(Storage::path($file));
-
-            if (count(scandir($dirParent)) <= 2) {
-                Storage::deleteDirectory(dirname($file));
-            }
+        } catch (Exception $e) {
+            Log::error('خطایی در حذف پوشه های کاربر به همراه فایل پیش آمده ' . $e->getMessage());
         }
     }
 }

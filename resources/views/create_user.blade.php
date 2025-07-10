@@ -178,6 +178,9 @@
         @session('success')
             <span style="color:green; text-align:center">{{ $value }}</span>
         @endsession
+        <a href="{{ route('dashboard') }}" class="submit-btn" style="background-color: orange;text-decoration: none;">برگشت به پنل مدیریت</a>
+        <br/>
+        <br/>
         <form action="{{ route('user.store') }}" method="POST">
             @csrf
             <div class="input-group">

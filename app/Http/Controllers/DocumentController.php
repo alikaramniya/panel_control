@@ -62,7 +62,7 @@ class DocumentController extends Controller
             ]);
         } catch (Exception $e) {
             Log::error('Add new document error: ' . $e->getMessage());
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'در اضافه کردن سند جدید مشگلی پیش آمده'
@@ -91,51 +91,67 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        $file = $document->file;
+        try {
+            $file = $document->file;
 
-        if (Storage::exists($file)) {
-            Storage::delete($file);
+            if (Storage::exists($file)) {
+                Storage::delete($file);
+            }
+
+            $dirParent = dirname(Storage::path($file));
+
+            if (count(scandir($dirParent)) <= 2) {
+                Storage::deleteDirectory(dirname($file));
+            }
+
+            $document->delete();
+
+            return back();
+        } catch (Exception $e) {
+            Log::error('خطایی در حذف یک سند پیش آمده ' . $e->getMessage());
         }
-
-        $dirParent = dirname(Storage::path($file));
-
-        if (count(scandir($dirParent)) <= 2) {
-            Storage::deleteDirectory(dirname($file));
-        }
-
-        $document->delete();
-
-        return back();
     }
 
     public function listDocument(Request $request)
     {
-        $user = User::with('documents')->find($request->input('id'));
+        try {
+            $user = User::with('documents')->find($request->input('id'));
 
-        $isAdmin = Gate::forUser($user)->allows('isAdmin');
+            $isAdmin = Gate::forUser($user)->allows('isAdmin');
 
-        return view('user', compact('user', 'isAdmin'));
+            return view('user', compact('user', 'isAdmin'));
+        } catch (Exception $e) {
+            Log::error('خطایی در گرفتن لیست اسناد یک کاربر پیش آمده ' . $e->getMessage());
+        }
     }
 
     public function download(Document $document)
     {
-        $file = Str::replaceFirst('public', 'storage/public', $document->file);
+        try {
+            $file = Str::replaceFirst('public', 'storage/public', $document->file);
 
-        if (Storage::exists($file)) {
-            return Storage::download($file);
+            if (Storage::exists($file)) {
+                return Storage::download($file);
+            }
+        } catch (Exception $e) {
+            Log::error('خطایی در دانلود فایل پیش آمده' . ' ' . $e->getMessage());
         }
     }
 
     public function show(Document $document)
     {
-        $file = Str::replaceFirst('public', 'storage/public', $document->file);
+        try {
+            $file = Str::replaceFirst('public', 'storage/public', $document->file);
 
-        if (Storage::exists($file)) {
-            if ($document->file_type === 'file') {
-                return "<img src='/storage/$file' />" ;
+            if (Storage::exists($file)) {
+                if ($document->file_type === 'file') {
+                    return "<img src='/storage/$file' />" ;
+                }
+
+                return '/storage/' . $file;
             }
-
-            return '/storage/' . $file;
+        } catch (Exception $e) {
+            Log::error('خطایی در نمایش فایل پیش آمده برای پرینت گرفتن ' . $e->getMessage());
         }
     }
 }

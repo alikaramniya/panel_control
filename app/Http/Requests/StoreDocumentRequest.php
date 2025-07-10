@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreDocumentRequest extends FormRequest
 {
@@ -24,8 +25,16 @@ class StoreDocumentRequest extends FormRequest
         return [
             'user_id' => 'required|exists:users,id',
             'password' => 'nullable|string',
-            'file_name' => 'required|string:3',
-            'file' => 'required|mimes:png,jpg,pdf,rar'
+            'file_name' => 'required|string|min:3',
+            'file' => 'required|mimes:png,jpg,pdf'
         ];
+    }
+
+    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
+    {
+        throw new HttpResponseException(response()->json([
+            'status' => 'error',
+            'message' => 'اطلاعات را با دقت وارد کنید'
+        ]));
     }
 }

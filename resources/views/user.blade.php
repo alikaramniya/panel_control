@@ -258,7 +258,7 @@
                     ]) href="{{ route('user.toggle.role', $user) }}">ادمین</a>
                     @can('canDeleteUser', $user)
                         &nbsp;
-                        <a class="dashboard-btn" id="deleteUser" style="color:orange;border-color:orange">حذف کاربر</a>
+                        <a class="dashboard-btn" id="deleteUser" style="color:orange;border-color:orange;cursor: pointer;">حذف کاربر</a>
                         <script>
                             const deleteUser = document.getElementById('deleteUser');
                             let state = 0;

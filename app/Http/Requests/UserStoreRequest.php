@@ -25,7 +25,7 @@ class UserStoreRequest extends FormRequest
             'phone' => 'required|string|min:11|max:13|unique:users,phone' ,
             'username' => 'required|string|unique:users,username',
             'name' => 'required|string|min:3',
-            'password' => 'required|string',
+            'password' => 'required|string|min:8',
             'role' => 'nullable|in:user,admin'
         ];
     }
