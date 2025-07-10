@@ -3,13 +3,14 @@
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\CheckUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [UserController::class, 'index'])->middleware('auth')->name('home');
 
-Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified'])->can('isAdmin')->name('dashboard');
+Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['auth', 'verified', CheckUserIsAdmin::class])->name('dashboard');
 
-Route::middleware(['can:isAdmin', 'auth'])->prefix('user')->controller(UserController::class)->group(function () {
+Route::middleware([CheckUserIsAdmin::class, 'auth'])->prefix('user')->controller(UserController::class)->group(function () {
     Route::get('/search', 'search')->name('user.search');
     Route::get('/toggle/{user}', 'toggle')->name('user.toggle.role');
     Route::get('/create', 'create')->name('user.create');
@@ -19,16 +20,18 @@ Route::middleware(['can:isAdmin', 'auth'])->prefix('user')->controller(UserContr
     Route::get('/user', 'user')->name('profile.user');
 });
 Route::middleware(['auth'])->prefix('document')->controller(DocumentController::class)->group(function () {
-    Route::post('/send', 'store')->can('isAdmin')->name('user.document.send');
-    Route::delete('/delete/{document}', 'destroy')->can('isAdmin')->name('document.delete');
-    Route::get('/list', 'listDocument')->can('isAdmin')->name('document.list');
+    Route::middleware(CheckUserIsAdmin::class)->group(function () {
+        Route::post('/send', 'store')->name('user.document.send');
+        Route::delete('/delete/{document}', 'destroy')->name('document.delete');
+        Route::get('/list', 'listDocument')->name('document.list');
+    });
     Route::get('/download/{document}', 'download')->name('document.download');
     Route::get('/show/{document}', 'show')->name('document.show');
 });
 /* Route::middleware('auth')->group(function () { */
-    /* Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit'); */
-    /* Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update'); */
-    /* Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); */
+/* Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit'); */
+/* Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update'); */
+/* Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); */
 /* }); */
 
 require __DIR__.'/auth.php';
