@@ -23,7 +23,7 @@ class UserStoreRequest extends FormRequest
     {
         return [
             'phone' => 'required|string|min:11|max:13|unique:users,phone' ,
-            'username' => 'required|string|unique:users,username',
+            'username' => 'required|string|unique:users,username|min:3',
             'name' => 'required|string|min:3',
             'password' => 'required|string|min:8',
             'role' => 'nullable|in:user,admin'
