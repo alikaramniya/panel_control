@@ -288,7 +288,7 @@
                                     class="fas file-icon {{ $document->file_type === 'file' ? 'image fa-file-image' : 'pdf fa-file-pdf' }}"></i>
                             </td>
                             <td data-label="نام فایل" class="file-name">{{ $document->file_name }}</td>
-                            <td data-label="تاریخ ارسال">۱۸ تیر ۱۴۰۴</td>
+                            <td data-label="تاریخ ارسال">{{ jdate($document->file_date_upload)->format('%d %B %Y') }}</td>
                             <td data-label="عملیات" class="actions">
                                 <a href="{{ route('document.download', $document->id) }}" class="download-btn">
                                     <i class="fas fa-download"></i>
