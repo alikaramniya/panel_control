@@ -489,7 +489,8 @@
                     <h3>تغییر رمز عبور</h3>
                     <div class="input-group">
                         <i class="fa-solid fa-lock"></i>
-                        <input type="text" name="password" placeholder="رمز عبور جدید">
+                        <input type="text" name="password" data-url="{{ route('user.update.password') }}" placeholder="رمز عبور جدید">
+                        <span id="password-info"></span>
                     </div>
                 </div>
                 <form id="send-document" method="POST" enctype="multipart/form-data"

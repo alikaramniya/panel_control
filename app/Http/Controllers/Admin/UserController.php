@@ -8,6 +8,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -50,6 +51,40 @@ class UserController extends Controller
 
             return response()->json([
                 'user' => $user
+            ]);
+        } catch (Exception $e) {
+            Log::error('خطایی رخ داده در گرفتن کاربر');
+        }
+    }
+
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id' => 'required|exists:users,id',
+                'password' => 'required|min:8',
+            ], [
+                'password.required' => 'رمز نمیتونه خالی باشه.',
+                'password.min' => 'رمز عبور باید حداقل 8 کاراکتر باشد.',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors(),
+                ]);
+            }
+
+            $user = User::find($request->id);
+
+            $user->password = $request->password;
+
+            $user->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'رمز با موفقیت به روز رسانی شد'
             ]);
         } catch (Exception $e) {
             Log::error('خطایی رخ داده در گرفتن کاربر');

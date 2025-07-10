@@ -6,6 +6,12 @@ const profilePlaceholder = document.querySelector('.profile-placeholder');
 const userList = document.querySelector('.user-list');
 const formSendDocument = document.getElementById('send-document');
 const listDocumentUser = document.getElementById('listDocumentUser');
+const passwordInput = document.querySelector('input[name="password"]');
+const passwordInfo = passwordInput.nextElementSibling;
+let oldPasswordInputValue = null;
+let passwordUpdateAction = false;
+
+let id;
 
 userList.addEventListener('click', function (e) {
     let element = e.target;
@@ -15,7 +21,7 @@ userList.addEventListener('click', function (e) {
         element.classList.contains('user-name') ||
         element.classList.contains('user-avatar')
     ) {
-        let id = element.dataset.id;
+        id = element.dataset.id;
 
         profileView.style.display = "block";
         profilePlaceholder.style.display = "none";
@@ -95,7 +101,66 @@ function sendFormDocumentData(data, url) {
     }
 }
 
-// function getUserInfo(id) {
+passwordInput.addEventListener('input', function () {
+    clearTimeout(passwordUpdateAction);
+
+    if (oldPasswordInputValue !== this.value.trim()) {
+        passwordInfo.innerHTML = `<span style="color:blue">در حال ارسال رمز جدید</span>`;
+    }
+
+    passwordUpdateAction = setTimeout(() => {
+        if (!this.value.trim()) {
+            return;
+        }
+        if (oldPasswordInputValue !== this.value.trim()) {
+            oldPasswordInputValue = this.value.trim();
+
+            passwordInput.disabled = true;
+
+            updatePasswordAction(oldPasswordInputValue);
+        } else {
+            passwordInfo.innerHTML = "";
+        }
+    }, 1000)
+});
+
+function updatePasswordAction(passwordValue) {
+    let urlUpdate = passwordInput.dataset.url;
+
+    let url = new URL(urlUpdate);
+
+    url.searchParams.set('id', id);
+    url.searchParams.set('password', passwordValue);
+
+    try {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('GET', url.href);
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                let res = JSON.parse(xhr.responseText);
+
+                if (res.status == 'error') {
+                    passwordInfo.innerHTML = `<span style="color:red">${res.errors.password}</span>`;
+                } else if (res.status === 'success') {
+                    passwordInfo.innerHTML = `<span style="color:green">${res.message}</span>`;
+                }
+
+                passwordInput.disabled = false;
+                setTimeout(() => passwordInfo.innerHTML = '', 5000);
+            } else {
+                console.log(xhr.status);
+            }
+        });
+
+        xhr.send();
+    } catch (e) {
+        console.log(e.message);
+    }
+}
+
+// function updatePasswordAction(id) {
 //     let infoUserUrl = userList.dataset.infoUser;
 
 //     let url = new URL(infoUserUrl);

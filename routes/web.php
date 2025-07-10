@@ -12,6 +12,7 @@ Route::get('/dashboard', [UserController::class, 'dashboard'])->middleware(['aut
 Route::middleware('auth')->group(function () {
     Route::get('/create', [UserController::class, 'create'])->name('user.create');
     Route::post('/store', [UserController::class, 'store'])->name('user.store');
+    Route::get('/update', [UserController::class, 'updatePassword'])->name('user.update.password');
     Route::get('/user', [UserController::class, 'user'])->name('profile.user');
     Route::post('/document/send', [DocumentController::class, 'store'])->name('user.document.send');
     Route::get('/document/list', [DocumentController::class, 'listDocument'])->name('document.list');
