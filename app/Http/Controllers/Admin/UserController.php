@@ -23,7 +23,7 @@ class UserController extends Controller
             return view('user');
         }
 
-        $users = User::latest()->take(5)->get();
+        $users = User::latest()->simplePaginate(10);
 
         return view('pannel', compact('users'));
     }
@@ -91,4 +91,34 @@ class UserController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        try {
+            $users = User::whereAny(['username', 'name'], 'like', $request->search . '%')->latest()->get();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => $users->count() === 0 ? 'کاربری با این مشخصات یافت نشد': 'اطلاعات با موفقیت دریافت شد',
+                'users' => $users
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطایی هنگام جستجو رخ داده است'
+            ]);
+        }
+    }
+
+    public function toggle(User $user)
+    {
+        if (auth()->user()->role !== 'super_admin') {
+            return back();
+        }
+
+        $user->role = $user->role === 'admin' ? 'user' : 'admin';
+
+        $user->save();
+
+        return back();
+    }
 }

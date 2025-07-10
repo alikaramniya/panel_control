@@ -6,10 +6,17 @@ const profilePlaceholder = document.querySelector('.profile-placeholder');
 const userList = document.querySelector('.user-list');
 const formSendDocument = document.getElementById('send-document');
 const listDocumentUser = document.getElementById('listDocumentUser');
+
 const passwordInput = document.querySelector('input[name="password"]');
 const passwordInfo = passwordInput.nextElementSibling;
 let oldPasswordInputValue = null;
 let passwordUpdateAction = false;
+
+const searchInput = document.getElementById('search');
+const searchInfo = searchInput.nextElementSibling;
+let oldSearchInputValue = null;
+let searchAction = false;
+let searchTimer = null;
 
 let id;
 
@@ -160,30 +167,81 @@ function updatePasswordAction(passwordValue) {
     }
 }
 
-// function updatePasswordAction(id) {
-//     let infoUserUrl = userList.dataset.infoUser;
+searchInput.addEventListener('input', function () {
+    clearTimeout(searchAction);
 
-//     let url = new URL(infoUserUrl);
+    if (oldSearchInputValue !== this.value.trim()) {
+        searchInfo.innerHTML = `<span style="color:blue">در حال جستجو</span>`;
+    }
 
-//     url.searchParams.append('id', id);
+    searchAction = setTimeout(() => {
+        if (oldSearchInputValue !== this.value.trim()) {
+            oldSearchInputValue = this.value.trim();
 
-//     try {
-//         const xhr = new XMLHttpRequest();
+            searchInput.disabled = true;
 
-//         xhr.open('GET', url.href);
+            searchUserAction(oldSearchInputValue);
+        } else {
+            searchInfo.innerHTML = "";
+        }
+    }, 1000)
+});
 
-//         xhr.addEventListener('load', function () {
-//             if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
-//                 let res = xhr.responseText;
+function searchUserAction(searchValue) {
+    let urlUpdate = searchInput.dataset.url;
 
-//                 console.log(res);
-//             } else {
-//                 console.log(xhr.status);
-//             }
-//         });
+    let url = new URL(urlUpdate);
+    url.searchParams.set('search', searchValue);
 
-//         xhr.send();
-//     } catch (e) {
-//         console.log(e.message);
-//     }
-// }
+    try {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('GET', url.href);
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                let res = JSON.parse(xhr.responseText);
+
+                if (res.status == 'error') {
+                    searchInfo.innerHTML = `<span style="color:red">${res.message}</span>`;
+                } else if (res.status === 'success') {
+                    renderListUsers(res.users);
+                    searchInfo.innerHTML = `<span style="color:green">${res.message}</span>`;
+                }
+
+                searchInput.disabled = false;
+                searchInput.focus();
+
+                if (searchTimer) {
+                    clearTimeout(searchTimer);
+                }
+
+                searchTimer = setTimeout(() => searchInfo.innerHTML = '', 5000);
+            } else {
+                console.log(xhr.status);
+            }
+        });
+
+        xhr.send();
+    } catch (e) {
+        console.log(e.message);
+    }
+}
+
+function renderListUsers(users) {
+    if (users.length === 0) return;
+
+    userList.innerHTML = "";
+    for (const user of users) {
+        userList.innerHTML += `
+            <li data-id="${user.id}" class="user-list-item" data-id="user1">
+                <img src="user-icon.jpg" alt="Avatar" data-id="${user.id}"
+                    class="user-avatar">
+                <div class="user-info">
+                    <div data-id="${user.id}" class="user-name">${user.name}</div>
+                    <div data-id="${user.id}" class="user-email">${user.username}</div>
+                </div>
+            </li>
+        ` ;
+    }
+}

@@ -442,8 +442,10 @@
                         class="fa-solid fa-plus"></i>ساخت کاربر جدید</button>
             </div>
             <div class="search-bar">
-                <input type="text" placeholder="جستجوی کاربر...">
+                <input id="search" type="search" name="search" data-url="{{ route('user.search') }}" placeholder="جستجوی کاربر...">
+                <span id="search-info"></span>
             </div>
+            {{ $users->links('vendor.pagination.simple-default') }}
             <ul class="user-list" data-info-user="{{ route('profile.user') }}">
                 <!-- User items will be dynamically handled but kept for initial view -->
                 @foreach ($users as $user)

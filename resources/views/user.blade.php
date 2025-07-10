@@ -252,8 +252,14 @@
             </div>
             <div class="user-info">
                 @can('isAdmin')
+                    <a class="dashboard-btn" @style([
+                        'color:red;border-color:red' => !$isAdmin,
+                        'color:green;border-color:green' => $isAdmin,
+                    ]) href="{{ route('user.toggle.role', $user) }}">ادمین</a>
+                    &nbsp;
                     <a class="dashboard-btn" href="{{ route('dashboard') }}">پنل</a>
                 @endcan
+
                 <form action="{{ route('logout') }}" method="POST" accept-charset="utf-8">
                     @csrf
                     <button type="submit" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>

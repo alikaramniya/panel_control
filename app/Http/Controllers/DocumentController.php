@@ -8,6 +8,7 @@ use App\Models\Document;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -35,7 +36,9 @@ class DocumentController extends Controller
     public function store(StoreDocumentRequest $request)
     {
         try {
-            $path = $request->file->store('document');
+            $user = User::find($request->user_id, 'username');
+
+            $path = $request->file->store("document/" . $user->username);
 
             $extension = $request->file->getClientOriginalExtension();
 
@@ -86,7 +89,9 @@ class DocumentController extends Controller
     {
         $user = User::with('documents')->find($request->input('id'));
 
-        return view('user', compact('user'));
+        $isAdmin = Gate::forUser($user)->allows('isAdmin');
+
+        return view('user', compact('user', 'isAdmin'));
     }
 
     public function download(Document $document)
