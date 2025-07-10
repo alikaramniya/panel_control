@@ -300,6 +300,14 @@
                                           {{ '/storage/' . $document->file }} @endif
                                       "
                                     class="print-btn"><i class="fas fa-print"></i> پرینت</a>
+
+                                @can('isAdmin')
+                                    <form action="{{ route('document.delete', $document->id) }}" method="post" accept-charset="utf-8">
+                                       @method('DELETE') 
+                                       @csrf
+                                       <button style="background-color:red;outline:none;border:none;width: 70px;padding:10px 0;margin-top:2px;border-radius:5px;color:white">حذف</button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach

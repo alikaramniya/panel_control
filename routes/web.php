@@ -17,9 +17,10 @@ Route::middleware(['can:isAdmin', 'auth'])->prefix('user')->controller(UserContr
     Route::get('/update', 'updatePassword')->name('user.update.password');
     Route::get('/user', 'user')->name('profile.user');
 });
-Route::middleware(['can:isAdmin', 'auth'])->prefix('document')->controller(DocumentController::class)->group(function () {
-    Route::post('/send', 'store')->name('user.document.send');
-    Route::get('/list', 'listDocument')->name('document.list');
+Route::middleware(['auth'])->prefix('document')->controller(DocumentController::class)->group(function () {
+    Route::post('/send', 'store')->can('isAdmin')->name('user.document.send');
+    Route::delete('/delete/{document}', 'destroy')->can('isAdmin')->name('document.delete');
+    Route::get('/list', 'listDocument')->can('isAdmin')->name('document.list');
     Route::get('/download/{document}', 'download')->name('document.download');
     Route::get('/show/{document}', 'show')->name('document.show');
 });

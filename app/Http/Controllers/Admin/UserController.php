@@ -7,6 +7,7 @@ use App\Http\Requests\UserStoreRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,7 +15,9 @@ class UserController extends Controller
 {
     public function index()
     {
-        return view('user');
+        $isAdmin = Gate::forUser(auth()->user())->allows('isAdmin');
+
+        return view('user', compact('isAdmin'));
     }
 
     public function dashboard()
@@ -112,6 +115,10 @@ class UserController extends Controller
     public function toggle(User $user)
     {
         if (auth()->user()->role !== 'super_admin') {
+            return back();
+        }
+
+        if ($user->role === 'super_admin') {
             return back();
         }
 

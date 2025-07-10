@@ -82,7 +82,21 @@ class DocumentController extends Controller
      */
     public function destroy(Document $document)
     {
-        //
+        $file = $document->file;
+
+        if (Storage::exists($file)) {
+            Storage::delete($file);
+        }
+
+        $dirParent = dirname(Storage::path($file));
+
+        if (count(scandir($dirParent)) <= 2) {
+            Storage::deleteDirectory(dirname($file));
+        }
+
+        $document->delete();
+
+        return back();
     }
 
     public function listDocument(Request $request)
