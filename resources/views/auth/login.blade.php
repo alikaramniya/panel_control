@@ -41,7 +41,8 @@
         .login-container {
             display: flex;
             width: 100%;
-            max-width: 1000px; /* Adjusted max-width for login */
+            max-width: 1000px;
+            /* Adjusted max-width for login */
             min-height: 600px;
             background-color: var(--panel-background);
             border-radius: 20px;
@@ -74,7 +75,7 @@
             line-height: 1.8;
             font-weight: 300;
         }
-        
+
         /* 2. Login Panel (Left) - فرم ورود */
         .login-panel {
             flex-basis: 50%;
@@ -96,7 +97,7 @@
             margin-bottom: 2.5rem;
             text-align: right;
         }
-        
+
         .input-group {
             position: relative;
             margin-bottom: 1.5rem;
@@ -106,13 +107,15 @@
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
-            left: 15px; /* Icon on the left for RTL */
+            left: 15px;
+            /* Icon on the left for RTL */
             color: var(--text-secondary-color);
         }
 
         .input-group input {
             width: 100%;
-            padding: 14px 20px 14px 45px; /* Padding for icon */
+            padding: 14px 20px 14px 45px;
+            /* Padding for icon */
             border: 1px solid var(--border-color);
             border-radius: 10px;
             font-family: 'Vazirmatn', sans-serif;
@@ -123,8 +126,8 @@
         .input-group input:focus {
             outline: none;
             border-color: var(--primary-color);
-		}
-        
+        }
+
         .login-btn {
             width: 100%;
             padding: 14px 20px;
@@ -155,7 +158,7 @@
             text-decoration: none;
             font-weight: 500;
         }
-        
+
         /* Responsive Design */
         @media (max-width: 900px) {
             .login-container {
@@ -163,12 +166,14 @@
                 min-height: auto;
                 margin: 2rem 0;
             }
+
             .info-panel {
                 flex-basis: auto;
                 min-height: 250px;
                 text-align: center;
             }
-             .login-panel {
+
+            .login-panel {
                 padding: 2rem;
             }
         }
@@ -177,31 +182,35 @@
 <body>
 
     <div class="login-container">
-        
+
         <div class="info-panel">
             <h1>به وبسایت ما خوش امدید</h1>
-            <p>اینجا فضای کاربری شما برای مدیریت یکپارچه تمام فعالیت‌هاست. به سادگی کاربران را مدیریت کنید، آمارها را تحلیل کرده و بهره‌وری خود را افزایش دهید.</p>
+            <p>اینجا فضای کاربری شما برای مدیریت یکپارچه تمام فعالیت‌هاست. به سادگی کاربران را مدیریت کنید، آمارها را
+                تحلیل کرده و بهره‌وری خود را افزایش دهید.</p>
         </div>
 
         <div class="login-panel">
             <div class="login-form">
                 <h2>ورود به حساب کاربری</h2>
                 <p>برای ادامه، نام کاربری و رمز عبور خود را وارد کنید.</p>
-                
+
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div class="input-group">
                         <i class="fa-solid fa-user"></i>
                         <input type="text" name="username" placeholder="نام کاربری" required>
+                        @error('username')
+                            <span style="color:red">{{ $message }}</span>
+                        @enderror
                     </div>
-                    
+
                     <div class="input-group">
                         <i class="fa-solid fa-lock"></i>
                         <input type="password" name="password" placeholder="رمز عبور" required>
                     </div>
 
                     <button type="submit" class="login-btn">ورود</button>
-                    
+
                     <div class="signup-link">
                         <a href="#">رمز عبور خود را فراموش کرده‌اید؟</a>
                     </div>
@@ -213,3 +222,4 @@
 
 </body>
 </html>
+
