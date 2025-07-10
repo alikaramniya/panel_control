@@ -60,7 +60,6 @@ class UserController extends Controller
         }
     }
 
-
     public function updatePassword(Request $request)
     {
         try {
@@ -101,7 +100,7 @@ class UserController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => $users->count() === 0 ? 'کاربری با این مشخصات یافت نشد': 'اطلاعات با موفقیت دریافت شد',
+                'message' => $users->count() === 0 ? 'کاربری با این مشخصات یافت نشد' : 'اطلاعات با موفقیت دریافت شد',
                 'users' => $users
             ]);
         } catch (Exception $e) {

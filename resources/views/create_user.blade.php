@@ -182,8 +182,16 @@
             @csrf
             <div class="input-group">
                 <i class="fa-solid fa-phone"></i>
-                <input type="tel" name="phone" placeholder="شماره تلفن" required>
+                <input type="tel" pattern="^09\d{9}$" name="phone" placeholder="شماره تلفن" required>
                 @error('phone')
+                    <span style="color:red">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-user"></i>
+                <input type="text" name="name" placeholder="اسم" required>
+                @error('name')
                     <span style="color:red">{{ $message }}</span>
                 @enderror
             </div>
