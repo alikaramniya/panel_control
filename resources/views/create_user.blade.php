@@ -42,7 +42,8 @@
             width: 100%;
             max-width: 500px;
             background-color: var(--panel-background);
-            padding: 2.5rem; /* A bit more padding for a spacious form */
+            padding: 2.5rem;
+            /* A bit more padding for a spacious form */
             border-radius: 20px;
             box-shadow: var(--shadow);
         }
@@ -59,7 +60,7 @@
             margin-bottom: 2.5rem;
             text-align: center;
         }
-        
+
         /* Input fields styles from your design */
         .input-group {
             position: relative;
@@ -90,7 +91,8 @@
             outline: none;
             border-color: var(--primary-color);
         }
-        .input-group input:focus + i {
+
+        .input-group input:focus+i {
             color: var(--primary-color);
         }
 
@@ -134,14 +136,14 @@
             transform: scale(0.5);
             transition: opacity 0.2s, transform 0.2s;
         }
-        
+
         /* Style for when the checkbox is checked */
-        .checkbox-group input[type="checkbox"]:checked + .custom-checkbox {
+        .checkbox-group input[type="checkbox"]:checked+.custom-checkbox {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
 
-        .checkbox-group input[type="checkbox"]:checked + .custom-checkbox .fa-check {
+        .checkbox-group input[type="checkbox"]:checked+.custom-checkbox .fa-check {
             opacity: 1;
             transform: scale(1);
         }
@@ -172,26 +174,42 @@
     <div class="form-container">
         <h2>ساخت کاربر جدید</h2>
         <p>اطلاعات زیر را برای ایجاد اکانت جدید تکمیل کنید.</p>
-        
-        <form>
+
+        @session('success')
+            <span style="color:green; text-align:center">{{ $value }}</span>
+        @endsession
+        <form action="{{ route('user.store') }}" method="POST">
+            @csrf
             <div class="input-group">
                 <i class="fa-solid fa-phone"></i>
-                <input type="tel" placeholder="شماره تلفن" required>
+                <input type="tel" name="phone" placeholder="شماره تلفن" required>
+                @error('phone')
+                    <span style="color:red">{{ $message }}</span>
+                @enderror
             </div>
 
             <div class="input-group">
                 <i class="fa-solid fa-user"></i>
-                <input type="text" placeholder="نام کاربری" required>
+                <input type="text" name="username" placeholder="نام کاربری" required>
+                @error('username')
+                    <span style="color:red">{{ $message }}</span>
+                @enderror
             </div>
-            
+
             <div class="input-group">
                 <i class="fa-solid fa-lock"></i>
-                <input type="password" placeholder="رمز عبور" required>
+                <input type="password" name="password" placeholder="رمز عبور" required>
+                @error('password')
+                    <span style="color:red">{{ $message }}</span>
+                @enderror
             </div>
 
             <div class="checkbox-group">
                 <label for="isAdmin">
-                    <input type="checkbox" id="isAdmin">
+                    <input type="checkbox" name="role" value="admin" id="isAdmin">
+                    @error('role')
+                        <span style="color:red">{{ $message }}</span>
+                    @enderror
                     <span class="custom-checkbox">
                         <i class="fa-solid fa-check"></i>
                     </span>

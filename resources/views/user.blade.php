@@ -97,6 +97,15 @@
             transition: all 0.3s ease;
             margin-right: 2rem;
         }
+        
+        .dashboard-btn {
+            width: 70px;
+            text-align:center; 
+            padding: 5px 0;
+            text-decoration: none;
+            border: 1px solid blue;
+            border-radius: 5px;
+        }
 
         .logout-btn:hover {
             background-color: #ff4d4d;
@@ -242,7 +251,14 @@
                 <p>فایل‌هایی که تاکنون از طرف مدیریت دریافت کرده‌اید:</p>
             </div>
             <div class="user-info">
-                <button class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
+                @can('isAdmin')
+                    <a class="dashboard-btn" href="{{ route('dashboard') }}">پنل</a>
+                @endcan
+                <form action="{{ route('logout') }}" method="POST" accept-charset="utf-8">
+                    @csrf
+                    <button type="submit" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
+                </form>
+
                 <span class="username">{{ $user->username }}</span>
                 <img src="{{ asset('user-icon.jpg') }}" alt="User Avatar">
             </div>
@@ -268,8 +284,8 @@
                             <td data-label="نام فایل" class="file-name">{{ $document->file_name }}</td>
                             <td data-label="تاریخ ارسال">۱۸ تیر ۱۴۰۴</td>
                             <td data-label="عملیات" class="actions">
-                                <a href="{{ route('document.download', $document->id) }}" class="download-btn"
-                                    class="fas fa-download"></i>
+                                <a href="{{ route('document.download', $document->id) }}" class="download-btn">
+                                    <i class="fas fa-download"></i>
                                     دانلود</a>
                                 <a href="#"
                                     data-url="
@@ -287,6 +303,7 @@
     </div>
     <script>
         const buttons = document.getElementById('buttons');
+        const logoutBtn = document.getElementById('logout-btn');
 
         buttons.addEventListener('click', function(e) {
             if (e.target.classList.contains('print-btn')) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UserStoreRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -29,6 +30,17 @@ class UserController extends Controller
     public function create()
     {
         return view('create_user');
+    }
+
+    public function store(UserStoreRequest $request)
+    {
+        try {
+            User::create($request->validated());
+
+            return back()->withSuccess('اکانت با موفقیت ساخته شد');
+        } catch (Exception $e) {
+            Log::error('Error when create new user account ' . $e->getMessage());
+        }
     }
 
     public function user(Request $request)
