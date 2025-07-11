@@ -180,4 +180,55 @@ class UserController extends Controller
             Log::error('خطایی در حذف پوشه های کاربر به همراه فایل پیش آمده ' . $e->getMessage());
         }
     }
+
+    public function upload(Request $request)
+    {
+        try {
+            $user = User::find($request->id);
+
+            if ($request->action === 'upload') {
+                $path = $request->avatar->store('avatar') ;
+            } else {
+                $path = 'avatar_def/user-icon.png';
+            }
+
+            if (!is_null($user->profile) && $user->profile !== 'avatar_def/user-icon.png') {
+                if (Storage::exists($user->profile)) {
+                    Storage::delete($user->profile);
+                }
+            }
+
+            $user->profile = $path;
+
+            $user->save();
+
+            return response()->json([
+                'status' => 'success',
+                'path' => $path,
+                'message' => 'آپلود شد :)'
+            ]);
+        } catch (Exception $e) {
+            Log::error('خطایی هنگام آپلود تصویر پیش آمده : ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'آپلود نشد :('
+            ]);
+        }
+    }
+    public function getImage(Request $request)
+    {
+        try {
+            return response()->json([
+                'status' => 'success',
+                'path' => User::find($request->id)->profile,
+            ]);
+        } catch (Exception $e) {
+            Log::error('خطایی در گرفتن تصویر کاربر پیش آمده : ' . $e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطایی در گرفتن تصیویر پیش آمده'
+            ]);
+        }
+    }
 }

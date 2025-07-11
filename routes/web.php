@@ -15,6 +15,8 @@ Route::middleware([CheckUserIsAdmin::class, 'auth'])->prefix('user')->controller
     Route::get('/toggle/{user}', 'toggle')->name('user.toggle.role');
     Route::get('/create', 'create')->name('user.create');
     Route::get('/delete/{user}', 'delete')->name('user.delete');
+    Route::post('/upload', 'upload')->name('user.upload.profile');
+    Route::get('/image', 'getImage')->name('user.profile.image');
     Route::post('/store', 'store')->name('user.store');
     Route::get('/update', 'updatePassword')->name('user.update.password');
     Route::get('/user', 'user')->name('profile.user');

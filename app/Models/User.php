@@ -62,4 +62,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(Document::class, 'user_id', 'id');
     }
+
+    protected $attributes = [
+        'profile' => 'avatar_def/user-icon.png' 
+    ];
 }

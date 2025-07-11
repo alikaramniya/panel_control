@@ -7,6 +7,11 @@ const userList = document.querySelector('.user-list');
 const formSendDocument = document.getElementById('send-document');
 const listDocumentUser = document.getElementById('listDocumentUser');
 const formInfo = document.getElementById('formInfo');
+const pictureSection = document.querySelector('.picture-overlay');
+const avatarMessage = document.getElementById('avatar-message');
+const profileImage = document.getElementById('profile-img');
+console.log(profileImage);
+const token = pictureSection.dataset.token;
 
 const passwordInput = document.querySelector('input[name="password"]');
 const passwordInfo = passwordInput.nextElementSibling;
@@ -30,6 +35,8 @@ userList.addEventListener('click', function (e) {
         element.classList.contains('user-avatar')
     ) {
         id = element.dataset.id;
+
+        getProfileUser();
 
         profileView.style.display = "block";
         profilePlaceholder.style.display = "none";
@@ -99,7 +106,6 @@ function sendFormDocumentData(data, url) {
 
 
                 if (res.status === 'success') {
-                    console.log(res);
                     formInfo.innerHTML = `<i style="color:green">${res.message}</i>`;
                 } else if (res.status === 'error') {
                     formInfo.innerHTML = `<i style="color:red">${res.message}</i>`;
@@ -251,5 +257,90 @@ function renderListUsers(users) {
                 </div>
             </li>
         ` ;
+    }
+}
+
+pictureSection.addEventListener('click', function (e) {
+    let avatar = document.getElementById('picture-avatar');
+    let url = avatar.dataset.url;
+    let action;
+
+    if (e.target.classList.contains('fa-camera')) {
+        action = 'upload';
+        avatar.addEventListener('change', function () {
+            uploadImage(this.files[0], url, action);
+        });
+    }
+
+    if (e.target.classList.contains('fa-trash-can')) {
+        action = 'delete';
+
+        uploadImage(null, url, action);
+    }
+
+});
+
+function uploadImage(file, url, action) {
+    try {
+        const formData = new FormData();
+
+        formData.append('id', id);
+        formData.append('avatar', file);
+        formData.append('action', action);
+
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('POST', url);
+
+        xhr.setRequestHeader('X-CSRF-TOKEN', token);
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                const res = JSON.parse(xhr.responseText);
+
+                if (res.status === 'success') {
+                    pictureSection.previousElementSibling.src = '/storage/' + res.path;
+                    avatarMessage.innerHTML = `<i style="color:green">${res.message}</i>`;
+                } else if (re.status === 'error') {
+                    avatarMessage.innerHTML = `<i style="color:red">${res.message}</i>`;
+                }
+            } else {
+                console.log(xhr.status);
+            }
+            setTimeout(() => {
+                avatarMessage.innerHTML = '';
+                location.reload();
+            }, 2000);
+        });
+
+        xhr.send(formData);
+    } catch (e) {
+        console.log('خطایی در هنگام آپلود پیش آمده');
+    }
+}
+
+function getProfileUser() {
+    try {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('GET', profileImage.dataset.url + '?id=' + id);
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                const res = JSON.parse(xhr.responseText);
+
+                if (res.status === 'success') {
+                    profileImage.src = '/storage/' + res.path;
+                } else if (res.status === 'error') {
+                    console.log(res.message);
+                }
+            } else {
+                console.log(xhr.status);
+            }
+        });
+
+        xhr.send();
+    } catch (e) {
+        console.log('خطایی در هنگام آپلود پیش آمده');
     }
 }

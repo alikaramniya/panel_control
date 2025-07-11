@@ -450,7 +450,7 @@
                 <!-- User items will be dynamically handled but kept for initial view -->
                 @foreach ($users as $user)
                     <li data-id="{{ $user->id }}" class="user-list-item" data-id="user1">
-                        <img src="{{ asset('user-icon.jpg') }}" alt="Avatar" data-id="{{ $user->id }}"
+                        <img src="{{ '/storage/' . $user->profile }}" alt="Avatar" data-id="{{ $user->id }}"
                             class="user-avatar">
                         <div class="user-info">
                             <div data-id="{{ $user->id }}" class="user-name">{{ $user->name }}</div>
@@ -471,12 +471,14 @@
             <div class="profile-view">
                 <header class="profile-header">
                     <div class="profile-picture-container">
-                        <img src="{{ asset('user-icon.jpg') }}" alt="Profile Picture" class="profile-picture"
-                            id="profile-img">
-                        <div class="picture-overlay">
-                            <i class="fa-solid fa-camera" title="تغییر عکس"></i>
-                            <i class="fa-solid fa-trash-can" title="حذف عکس"></i>
+                        <img alt="Profile Picture" class="profile-picture"
+                            id="profile-img" data-url="{{ route('user.profile.image') }}">
+                        <div class="picture-overlay" data-token="{{ csrf_token() }}">
+                            <label for="picture-avatar"><i class="fa-solid fa-camera" title="تغییر عکس"></i></label>
+                            <label><i class="fa-solid fa-trash-can" title="حذف عکس"></i></label>
                         </div>
+                        <span id="avatar-message"></span>
+                        <input data-url="{{ route('user.upload.profile') }}" type="file" style="display: none;" value="" accept="png,jpg,jpeg" name="avatar" id="picture-avatar"/>
                     </div>
                     <div class="profile-details">
                         <h2 id="profile-name"></h2>

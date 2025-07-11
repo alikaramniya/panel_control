@@ -286,7 +286,7 @@
                 </form>
 
                 <span class="username">{{ $user->username }}</span>
-                <img src="{{ asset('user-icon.jpg') }}" alt="User Avatar">
+                <img src="{{ '/storage/' . $user->profile }}" alt="User Avatar">
             </div>
         </header>
 
