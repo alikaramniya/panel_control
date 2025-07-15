@@ -30,10 +30,5 @@ Route::middleware(['auth'])->prefix('document')->controller(DocumentController::
     Route::get('/download/{document}', 'download')->name('document.download');
     Route::get('/show/{document}', 'show')->name('document.show');
 });
-/* Route::middleware('auth')->group(function () { */
-/* Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit'); */
-/* Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update'); */
-/* Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); */
-/* }); */
 
 require __DIR__.'/auth.php';
