@@ -514,8 +514,8 @@
 
                     <!-- Section: File Management -->
                     <div class="form-section">
-                        <h3>مدیریت فایل‌ها</h3>
-                        <input type="file" name="file" id="file-upload">
+                        <h3><span>حجم فایل نباید بیشتر از <mark>دو مگابایت</mark> باشد و فرمت آن هم <mark>jpg, png, jpeg, zip</mark> میتواند باشد</span></h3>
+                        <input type="file" name="file" id="file-upload" accept=".jpg,.png,.jpeg,.zip">
                     </div>
 
                     <footer class="profile-footer">

@@ -101,9 +101,10 @@ function sendFormDocumentData(data, url) {
         xhr.open('POST', url);
 
         xhr.addEventListener('load', function () {
-            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+            if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
                 let res = JSON.parse(xhr.responseText);
 
+                console.log(res);
 
                 if (res.status === 'success') {
                     formInfo.innerHTML = `<i style="color:green">${res.message}</i>`;

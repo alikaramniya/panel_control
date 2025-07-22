@@ -26,7 +26,7 @@ class StoreDocumentRequest extends FormRequest
             'user_id' => 'required|exists:users,id',
             'password' => 'nullable|string',
             'file_name' => 'required|string|min:3',
-            'file' => 'required|mimes:png,jpg,pdf'
+            'file' => 'required|file|max:2048|mimes:png,jpg,jpeg,pdf'
         ];
     }
 
