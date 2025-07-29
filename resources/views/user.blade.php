@@ -425,6 +425,8 @@
                     if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
                         let res = JSON.parse(xhr.responseText);
 
+                        console.log(res);
+
                         if (res.status == 'error') {
                             passwordInfo.innerHTML = `<span style="color:red">${res.message}</span>`;
                         } else if (res.status === 'success') {

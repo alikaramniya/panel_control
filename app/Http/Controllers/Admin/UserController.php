@@ -93,15 +93,12 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'id'       => 'required|exists:users,id',
                 'password' => 'required|min:8',
-            ], [
-                'password.required' => 'رمز نمیتونه خالی باشه.',
-                'password.min'      => 'رمز عبور باید حداقل 8 کاراکتر باشد.',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => $validator->errors(),
+                    'message' => 'اطلاعات وارد شده درست نمیباشد',
                 ]);
             }
 
