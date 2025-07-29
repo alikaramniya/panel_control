@@ -173,7 +173,10 @@
 
     <div class="form-container">
         <h2>ساخت کاربر جدید</h2>
-        <p>اطلاعات زیر را برای ایجاد اکانت جدید تکمیل کنید.</p>
+        <p>
+اطلاعات زیر را برای ایجاد اکانت جدید تکمیل کنید.<br/>
+<i style="color:orange">بعد از ساخت کاربر فقط پروفایل و رمز آن قابل تغییر است</i>
+        </p>
 
         @session('success')
             <span style="color:green; text-align:center">{{ $value }}</span>

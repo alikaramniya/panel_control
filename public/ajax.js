@@ -10,7 +10,6 @@ const formInfo = document.getElementById('formInfo');
 const pictureSection = document.querySelector('.picture-overlay');
 const avatarMessage = document.getElementById('avatar-message');
 const profileImage = document.getElementById('profile-img');
-console.log(profileImage);
 const token = pictureSection.dataset.token;
 
 const passwordInput = document.querySelector('input[name="password"]');
@@ -51,12 +50,9 @@ userList.addEventListener('click', function (e) {
         formSendDocument.firstElementChild.value = id;
 
         let href = new URL(listDocumentUser.href);
-        // href.searchParams.remove('id');
         href.searchParams.set('id', id)
 
         listDocumentUser.href = href;
-
-        // getUserInfo(id);
     }
 })
 
@@ -249,7 +245,7 @@ function renderListUsers(users) {
     for (const user of users) {
         userList.innerHTML += `
             <li data-id="${user.id}" class="user-list-item" data-id="user1">
-                <img src="user-icon.jpg" alt="Avatar" data-id="${user.id}"
+                <img src="/storage/${user.profile}" alt="Avatar" data-id="${user.id}"
                     class="user-avatar">
                 <div class="user-info">
                     <div data-id="${user.id}" class="user-name">${user.name}</div>
@@ -301,16 +297,13 @@ function uploadImage(file, url, action) {
                 if (res.status === 'success') {
                     pictureSection.previousElementSibling.src = '/storage/' + res.path;
                     avatarMessage.innerHTML = `<i style="color:green">${res.message}</i>`;
-                } else if (re.status === 'error') {
+                    renderListUser();
+                } else if (res.status === 'error') {
                     avatarMessage.innerHTML = `<i style="color:red">${res.message}</i>`;
                 }
             } else {
                 console.log(xhr.status);
             }
-            setTimeout(() => {
-                avatarMessage.innerHTML = '';
-                location.reload();
-            }, 2000);
         });
 
         xhr.send(formData);
@@ -342,5 +335,47 @@ function getProfileUser() {
         xhr.send();
     } catch (e) {
         console.log('خطایی در هنگام آپلود پیش آمده');
+    }
+}
+
+function renderListUser() {
+    try {
+        const xhr = new XMLHttpRequest();
+
+        xhr.open('GET', userList.dataset.url);
+
+        xhr.addEventListener('load', function () {
+            if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                const res = JSON.parse(xhr.responseText);
+
+                if (res.type === 'success') {
+                    renderListUserItem(res.users);
+                } else if (res.type === 'error') {
+                    console.log(res.message);
+                }
+            } else {
+                console.log(xhr.status);
+            }
+        });
+
+        xhr.send();
+    } catch (e) {
+        console.log('خطایی در گرفتن لیست جدید کاربران پیش آمده');
+    }
+}
+
+function renderListUserItem(users) {
+    userList.innerHTML = "";
+    for (const user of users) {
+        userList.innerHTML += `
+            <li data-id="${user.id}" class="user-list-item" data-id="user1">
+                <img src="/storage/${user.profile} " alt="Avatar" data-id="${user.id}"
+                    class="user-avatar">
+                <div class="user-info">
+                    <div data-id="${user.id}" class="user-name">${user.name}</div>
+                    <div data-id="${user.id}" class="user-email">${user.username}</div>
+                </div>
+            </li>
+       `;
     }
 }

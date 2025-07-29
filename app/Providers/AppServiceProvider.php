@@ -25,16 +25,32 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::before(function (User $user, string $ability) {
-            if ($user->role === 'super_admin') {
+            if ($user->role === "super_admin") {
                 return true;
             }
         });
-        Gate::define('isAdmin', function (User $user) {
-            return $user->isAdmin() ? true : false;
+        Gate::define(
+            "isAdmin",
+            fn(User $user) => $user->isAdmin() ? true : false,
+        );
+
+        Gate::define("canDeleteUser", function (User $user, User $currentUser) {
+            if ($user->isAdmin() && !$currentUser->isAdmin()) {
+                return true;
+            }
+
+            return false;
         });
 
-        Gate::define('canDeleteUser', function (User $user, User $currentUser) {
-            if ($user->isAdmin() && !$currentUser->isAdmin()) {
+        Gate::define("canUpdatePassword", function (
+            User $user,
+            User $currentUser
+        ) {
+            if ($user->isAdmin() && $currentUser->isAdmin()) {
+                return false;
+            }
+
+            if ($user->isAdmin() || $currentUser->id === $user->id) {
                 return true;
             }
 

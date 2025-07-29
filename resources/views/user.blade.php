@@ -97,10 +97,10 @@
             transition: all 0.3s ease;
             margin-right: 2rem;
         }
-        
+
         .dashboard-btn {
             width: 70px;
-            text-align:center; 
+            text-align:center;
             padding: 5px 0;
             text-decoration: none;
             border: 1px solid blue;
@@ -249,6 +249,24 @@
             <div class="welcome-message">
                 <h1>سلام، {{ $user->name }}!</h1>
                 <p>فایل‌هایی که تاکنون از طرف مدیریت دریافت کرده‌اید:</p>
+
+                <div class="form-section" style="margin-top: 10px;">
+                    <h3 style="margin-bottom: 5px">برای رمز فقط حروف انگلیسی یا عدد</h3>
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock"></i>
+                        <input
+                            autofocus
+                            pattern="" style="width: 250px; height: 30px; border-radius: 5px; outline:hidden; border:1px solid black; padding-right: 5px;font-size: 15px;font-family:inherit"
+                            type="password"
+                            name="password"
+                            data-url="{{ route('user.update.own.password') }}"
+                            data-id="{{ $user->id }}"
+                            placeholder="رمز جدید خود را وارد کنید"
+                            pattern="^[A-Za-z0-9]+$"
+                        />
+                        <div id="password-info"></div>
+                    </div>
+                </div>
             </div>
             <div class="user-info">
                 @can('isAdmin')
@@ -273,7 +291,7 @@
                                     state = 0;
                                 }, 2000);
                                 state = 1;
-                            }) 
+                            })
                         </script>
                     @endcan
                     &nbsp;
@@ -323,7 +341,7 @@
 
                                 @can('isAdmin')
                                     <form action="{{ route('document.delete', $document->id) }}" method="post" accept-charset="utf-8">
-                                       @method('DELETE') 
+                                       @method('DELETE')
                                        @csrf
                                        <button style="background-color:red;outline:none;border:none;width: 70px;padding:10px 0;margin-top:2px;border-radius:5px;color:white">حذف</button>
                                     </form>
@@ -339,6 +357,11 @@
         const buttons = document.getElementById('buttons');
         const logoutBtn = document.getElementById('logout-btn');
 
+        const passwordInput = document.querySelector('input[name="password"]');
+        const passwordInfo = passwordInput.nextElementSibling;
+        let oldPasswordInputValue = null;
+        let passwordUpdateAction = false;
+
         buttons.addEventListener('click', function(e) {
             if (e.target.classList.contains('print-btn')) {
                 const fileUrl = e.target.dataset.url;
@@ -349,7 +372,78 @@
                     win.print();
                 };
             }
-        })
+        });
+
+        passwordInput.addEventListener('input', function () {
+            let value = this.value.trim();
+            let regex = /^[A-Za-z0-9]{8,}$/;
+
+            if (!regex.test(value)) {
+                passwordInfo.innerHTML = `<span style="color:red">فقط کاراکتر انگلیسی و اعداد انگلیسی مجاز و طول رشته هم حداقل هشت کاراکتر باشد</span>`;
+                return;
+            }
+
+            clearTimeout(passwordUpdateAction);
+
+            if (oldPasswordInputValue !== value) {
+                passwordInfo.innerHTML = `<span style="color:blue">در حال ارسال رمز جدید</span>`;
+            }
+
+            passwordUpdateAction = setTimeout(() => {
+                if (!value) {
+                    return;
+                }
+                if (oldPasswordInputValue !== value) {
+                    oldPasswordInputValue = value;
+
+                    passwordInput.disabled = true;
+
+                    updatePasswordAction(oldPasswordInputValue);
+                } else {
+                    passwordInfo.innerHTML = "";
+                }
+            }, 1000)
+        });
+
+        function updatePasswordAction(passwordValue) {
+            let urlUpdate = passwordInput.dataset.url;
+
+            console.log(urlUpdate);
+
+            let url = new URL(urlUpdate);
+            let id = passwordInput.dataset.id;
+
+            url.searchParams.set('id', id);
+            url.searchParams.set('password', passwordValue);
+
+            try {
+                const xhr = new XMLHttpRequest();
+
+                xhr.open('GET', url.href);
+
+                xhr.addEventListener('load', function () {
+                    if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+                        let res = JSON.parse(xhr.responseText);
+
+                        if (res.status == 'error') {
+                            passwordInfo.innerHTML = `<span style="color:red">${res.message}</span>`;
+                        } else if (res.status === 'success') {
+                            passwordInfo.innerHTML = `<span style="color:green">${res.message}</span>`;
+                        }
+
+                        passwordInput.disabled = false;
+                        setTimeout(() => passwordInfo.innerHTML = '', 5000);
+                    } else {
+                        console.log(xhr.status);
+                    }
+                });
+
+                xhr.send();
+            } catch (e) {
+                console.log(e.message);
+            }
+        }
+
     </script>
 </body>
 </html>

@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UserStoreRequest;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Exception;
 
 class UserController extends Controller
 {
@@ -31,6 +31,28 @@ class UserController extends Controller
             $users = User::latest()->simplePaginate(10);
 
             return view('pannel', compact('users'));
+        } catch (Exception $e) {
+            Log::error('خطایی در گرفتن کاربران پیش آمده' . ' ' . $e->getMessage());
+        }
+    }
+
+    public function usersList()
+    {
+        try {
+            if (auth()->user()->role === 'user') {
+                return response()->json([
+                    'type' => 'error',
+                    'message' => 'شما دسترسی به لیست ندارید'
+                ]);
+            }
+
+            $users = User::latest()->limit(10)->get();
+
+            return response()->json([
+                'type' => 'success',
+                'message' => 'لیست کاربران با موفقیت دریافت شد',
+                'users' => $users
+            ]);
         } catch (Exception $e) {
             Log::error('خطایی در گرفتن کاربران پیش آمده' . ' ' . $e->getMessage());
         }
@@ -65,15 +87,59 @@ class UserController extends Controller
         }
     }
 
+    public function updateOwnPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'id'       => 'required|exists:users,id',
+                'password' => 'required|min:8',
+            ], [
+                'password.required' => 'رمز نمیتونه خالی باشه.',
+                'password.min'      => 'رمز عبور باید حداقل 8 کاراکتر باشد.',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => $validator->errors(),
+                ]);
+            }
+
+            $user = User::find($request->id);
+
+            if (Gate::denies('canUpdatePassword', $user)) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'شما دسترسی ندارید به تغییر رمز کاربر',
+                ]);
+            }
+
+            $user->password = $request->password;
+
+            $user->save();
+
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'رمز با موفقیت به روز رسانی شد'
+            ]);
+        } catch (Exception $e) {
+            Log::error('خطایی رخ داده در گرفتن کاربر');
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطایی در به روز رسانی پیش آمده'
+            ]);
+        }
+    }
+
     public function updatePassword(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'id' => 'required|exists:users,id',
+                'id'       => 'required|exists:users,id',
                 'password' => 'required|min:8',
             ], [
                 'password.required' => 'رمز نمیتونه خالی باشه.',
-                'password.min' => 'رمز عبور باید حداقل 8 کاراکتر باشد.',
+                'password.min'      => 'رمز عبور باید حداقل 8 کاراکتر باشد.',
             ]);
 
             if ($validator->fails()) {
@@ -90,7 +156,7 @@ class UserController extends Controller
             $user->save();
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'رمز با موفقیت به روز رسانی شد'
             ]);
         } catch (Exception $e) {
@@ -101,16 +167,16 @@ class UserController extends Controller
     public function search(Request $request)
     {
         try {
-            $users = User::whereAny(['username', 'name'], 'like', $request->search . '%')->latest()->get();
+            $users = User::query()->whereAny(['username', 'name'], 'like', addcslashes($request->search, '%_') . '%')->latest()->get();
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => $users->count() === 0 ? 'کاربری با این مشخصات یافت نشد' : 'اطلاعات با موفقیت دریافت شد',
-                'users' => $users
+                'users'   => $users,
             ]);
         } catch (Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'خطایی هنگام جستجو رخ داده است'
             ]);
         }
@@ -150,7 +216,7 @@ class UserController extends Controller
 
             $documents = $user->documents;
 
-            $this->deleteFileAndFolder($documents) ;
+            $this->deleteFileAndFolder($documents);
 
             $user->delete();
 
@@ -187,9 +253,22 @@ class UserController extends Controller
             $user = User::find($request->id);
 
             if ($request->action === 'upload') {
-                $path = $request->avatar->store('avatar') ;
+                $validator = Validator::make($request->all(), [
+                    'avatar' => 'required|file|mimes:png,jpg,pdf|max:1024'
+                ]);
+
+                if ($validator->fails()) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'حجم بالاس یا فرمت اشتبا' 
+                    ]);
+                }
+
+                $path    = $request->avatar->store('avatar');
+                $message = 'آپلود شد :)';
             } else {
-                $path = 'avatar_def/user-icon.png';
+                $path    = 'avatar_def/user-icon.png';
+                $message = 'حذف شد :(';
             }
 
             if (!is_null($user->profile) && $user->profile !== 'avatar_def/user-icon.png') {
@@ -203,30 +282,31 @@ class UserController extends Controller
             $user->save();
 
             return response()->json([
-                'status' => 'success',
-                'path' => $path,
-                'message' => 'آپلود شد :)'
+                'status'  => 'success',
+                'path'    => $path,
+                'message' => $message
             ]);
         } catch (Exception $e) {
             Log::error('خطایی هنگام آپلود تصویر پیش آمده : ' . $e->getMessage());
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'آپلود نشد :('
             ]);
         }
     }
+
     public function getImage(Request $request)
     {
         try {
             return response()->json([
                 'status' => 'success',
-                'path' => User::find($request->id)->profile,
+                'path'   => User::find($request->id)->profile,
             ]);
         } catch (Exception $e) {
             Log::error('خطایی در گرفتن تصویر کاربر پیش آمده : ' . $e->getMessage());
 
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'خطایی در گرفتن تصیویر پیش آمده'
             ]);
         }

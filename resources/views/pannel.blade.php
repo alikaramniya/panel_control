@@ -446,7 +446,7 @@
                 <span id="search-info"></span>
             </div>
             {{ $users->links('vendor.pagination.simple-default') }}
-            <ul class="user-list" data-info-user="{{ route('profile.user') }}">
+            <ul class="user-list" data-url="{{ route('user.list')}} " data-info-user="{{ route('profile.user') }}">
                 <!-- User items will be dynamically handled but kept for initial view -->
                 @foreach ($users as $user)
                     <li data-id="{{ $user->id }}" class="user-list-item" data-id="user1">
@@ -478,7 +478,7 @@
                             <label><i class="fa-solid fa-trash-can" title="حذف عکس"></i></label>
                         </div>
                         <span id="avatar-message"></span>
-                        <input data-url="{{ route('user.upload.profile') }}" type="file" style="display: none;" value="" accept="png,jpg,jpeg" name="avatar" id="picture-avatar"/>
+                        <input data-url="{{ route('user.upload.profile') }}" type="file" style="display: none;" value="" accept=".png,.jpg,.jpeg" name="avatar" id="picture-avatar"/>
                     </div>
                     <div class="profile-details">
                         <h2 id="profile-name"></h2>
@@ -514,8 +514,8 @@
 
                     <!-- Section: File Management -->
                     <div class="form-section">
-                        <h3>مدیریت فایل‌ها</h3>
-                        <input type="file" name="file" id="file-upload">
+                        <h3 style="color:orange">فقط فایل هایی با فرمت jpg,png,jpeg,pdf میتونی انتخاب کنی با حجم حداکثر سه مگابایت</h3>
+                        <input type="file" accept=".png,.jpg,.jpeg,.pdf" name="file" id="file-upload">
                     </div>
 
                     <footer class="profile-footer">
