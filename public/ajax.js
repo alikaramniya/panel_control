@@ -159,7 +159,7 @@ function updatePasswordAction(passwordValue) {
                 let res = JSON.parse(xhr.responseText);
 
                 if (res.status == 'error') {
-                    passwordInfo.innerHTML = `<span style="color:red">${res.errors.password}</span>`;
+                    passwordInfo.innerHTML = `<span style="color:red">${res.message}</span>`;
                 } else if (res.status === 'success') {
                     passwordInfo.innerHTML = `<span style="color:green">${res.message}</span>`;
                 }

@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
             User $user,
             User $currentUser
         ) {
-            if ($user->isAdmin() && $currentUser->isAdmin()) {
+            if (($user->isAdmin() && $currentUser->isAdmin()) && ($user->id !== $currentUser->id)) {
                 return false;
             }
 

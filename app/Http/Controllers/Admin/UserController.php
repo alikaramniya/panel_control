@@ -134,19 +134,23 @@ class UserController extends Controller
             $validator = Validator::make($request->all(), [
                 'id'       => 'required|exists:users,id',
                 'password' => 'required|min:8',
-            ], [
-                'password.required' => 'رمز نمیتونه خالی باشه.',
-                'password.min'      => 'رمز عبور باید حداقل 8 کاراکتر باشد.',
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
-                    'errors' => $validator->errors(),
+                    'message' => 'رمز شما معتبر نیست یا تعداد کاراکتر آن کمتر از ۸ رقم است',
                 ]);
             }
 
             $user = User::find($request->id);
+
+            if (Gate::denies('canUpdatePassword', $user)) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'شما دسترسی ندارید به تغییر رمز کاربر',
+                ]);
+            }
 
             $user->password = $request->password;
 
