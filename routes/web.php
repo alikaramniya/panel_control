@@ -13,9 +13,9 @@ Route::get("/dashboard", [UserController::class, "dashboard"])
     ->middleware(["auth", CheckUserIsAdmin::class])
     ->name("dashboard");
 
-Route::get("/user/update/own/password", [
+Route::post("/user/update/own/password", [
     UserController::class,
-    "updateOwnPassword",
+    "updatePassword",
 ])
     ->middleware(["auth"])
     ->name("user.update.own.password");

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,7 +101,7 @@
 
         .dashboard-btn {
             width: 70px;
-            text-align:center;
+            text-align: center;
             padding: 5px 0;
             text-decoration: none;
             border: 1px solid blue;
@@ -239,9 +240,10 @@
         }
     </style>
 </head>
+
 <body>
     @empty ($user)
-        @php($user = auth()->user()->load('documents'))
+    @php($user = auth()->user()->load('documents'))
     @endempty
 
     <div class="user-dashboard">
@@ -251,19 +253,22 @@
                 <p>فایل‌هایی که تاکنون از طرف مدیریت دریافت کرده‌اید:</p>
 
                 <div class="form-section" style="margin-top: 10px;">
-                    <h3 style="margin-bottom: 5px">برای رمز فقط حروف انگلیسی یا عدد</h3>
+                    <h3 style="margin-bottom: 5px;color:orange">رمز فقط حروف انگلیسی یا عدد</h3>
                     <div class="input-group">
-                        <i class="fa-solid fa-lock"></i>
-                        <input
-                            autofocus
-                            pattern="" style="width: 250px; height: 30px; border-radius: 5px; outline:hidden; border:1px solid black; padding-right: 5px;font-size: 15px;font-family:inherit"
-                            type="password"
-                            name="password"
-                            data-url="{{ route('user.update.own.password') }}"
-                            data-id="{{ $user->id }}"
-                            placeholder="رمز جدید خود را وارد کنید"
-                            pattern="^[A-Za-z0-9]+$"
-                        />
+                        <form action="{{ route('user.update.own.password') }}" method="post">
+                            @csrf
+                            <input type="hidden" value="{{ $user->id}}" name="id" />
+                            <input autofocus
+                                style="width: 250px; height: 30px; border-radius: 5px; outline:hidden; border:1px solid black; padding-right: 5px;font-size: 15px;font-family:inherit"
+                                type="password" name="password" placeholder="رمز جدید خود را وارد کنید" /><br />
+                            <input autofocus
+                                style="width: 250px; height: 30px; border-radius: 5px; outline:hidden; border:1px solid black; padding-right: 5px;font-size: 15px;font-family:inherit;margin-top: 5px"
+                                type="password" name="password_confirmation"
+                                placeholder="رمز خود را تکرار کنید" /><br />
+                            <button type="submit"
+                                style="background-color: chocolate; color: white; font-family: inherit; outline: none; padding: 5px; border-radius: 3px;border:none;margin-top: 5px">به
+                                روز رسانی</button>
+                        </form>
                         <div id="password-info"></div>
                     </div>
                 </div>
@@ -276,18 +281,19 @@
                     ]) href="{{ route('user.toggle.role', $user) }}">ادمین</a>
                     @can('canDeleteUser', $user)
                         &nbsp;
-                        <a class="dashboard-btn" id="deleteUser" style="color:orange;border-color:orange;cursor: pointer;">حذف کاربر</a>
+                        <a class="dashboard-btn" id="deleteUser" style="color:orange;border-color:orange;cursor: pointer;">حذف
+                            کاربر</a>
                         <script>
                             const deleteUser = document.getElementById('deleteUser');
                             let state = 0;
-                            deleteUser.addEventListener('click', function() {
+                            deleteUser.addEventListener('click', function () {
                                 this.innerHTML = 'مطمعنی؟';
                                 if (state === 1) {
-                                    this.href= "{{ route('user.delete', $user) }}"
+                                    this.href = "{{ route('user.delete', $user) }}"
                                 }
                                 setTimeout(() => {
                                     this.innerHTML = 'حذف کاربر';
-                                    this.href="#";
+                                    this.href = "#";
                                     state = 0;
                                 }, 2000);
                                 state = 1;
@@ -300,7 +306,8 @@
 
                 <form action="{{ route('logout') }}" method="POST" accept-charset="utf-8">
                     @csrf
-                    <button type="submit" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> خروج</button>
+                    <button type="submit" class="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        خروج</button>
                 </form>
 
                 <span class="username">{{ $user->username }}</span>
@@ -331,19 +338,20 @@
                                 <a href="{{ route('document.download', $document->id) }}" class="download-btn">
                                     <i class="fas fa-download"></i>
                                     دانلود</a>
-                                <a href="#"
-                                    data-url="
-                                      @if ($document->file_type !== 'pdf') {{ route('document.show', $document->id) }}
-                                      @else
-                                          {{ '/storage/' . $document->file }} @endif
-                                      "
-                                    class="print-btn"><i class="fas fa-print"></i> پرینت</a>
+                                <a href="#" data-url="
+                                                                      @if ($document->file_type !== 'pdf') {{ route('document.show', $document->id) }}
+                                                                      @else
+                                                                      {{ '/storage/' . $document->file }} @endif
+                                                                      " class="print-btn"><i class="fas fa-print"></i>
+                                    پرینت</a>
 
                                 @can('isAdmin')
-                                    <form action="{{ route('document.delete', $document->id) }}" method="post" accept-charset="utf-8">
-                                       @method('DELETE')
-                                       @csrf
-                                       <button style="background-color:red;outline:none;border:none;width: 70px;padding:10px 0;margin-top:2px;border-radius:5px;color:white">حذف</button>
+                                    <form action="{{ route('document.delete', $document->id) }}" method="post"
+                                        accept-charset="utf-8">
+                                        @method('DELETE')
+                                        @csrf
+                                        <button
+                                            style="background-color:red;outline:none;border:none;width: 70px;padding:10px 0;margin-top:2px;border-radius:5px;color:white">حذف</button>
                                     </form>
                                 @endcan
                             </td>
@@ -357,12 +365,11 @@
         const buttons = document.getElementById('buttons');
         const logoutBtn = document.getElementById('logout-btn');
 
-        const passwordInput = document.querySelector('input[name="password"]');
-        const passwordInfo = passwordInput.nextElementSibling;
-        let oldPasswordInputValue = null;
-        let passwordUpdateAction = false;
+        const formUpdatePassword = document.querySelector('form');
+        let passwordInfo = formUpdatePassword.nextElementSibling;
+        let btn = formUpdatePassword.lastElementChild;
 
-        buttons.addEventListener('click', function(e) {
+        buttons.addEventListener('click', function (e) {
             if (e.target.classList.contains('print-btn')) {
                 const fileUrl = e.target.dataset.url;
 
@@ -374,56 +381,54 @@
             }
         });
 
-        passwordInput.addEventListener('input', function () {
-            let value = this.value.trim();
+        formUpdatePassword.addEventListener('submit', function (e) {
+            e.preventDefault();
+
             let regex = /^[A-Za-z0-9]{8,}$/;
 
-            if (!regex.test(value)) {
+            let password = this.password;
+            let confirmPassword = this.password_confirmation;
+
+            if (!regex.test(password.value)) {
                 passwordInfo.innerHTML = `<span style="color:red">فقط کاراکتر انگلیسی و اعداد انگلیسی مجاز و طول رشته هم حداقل هشت کاراکتر باشد</span>`;
+                password.focus();
+                password.select();
                 return;
             }
 
-            clearTimeout(passwordUpdateAction);
-
-            if (oldPasswordInputValue !== value) {
-                passwordInfo.innerHTML = `<span style="color:blue">در حال ارسال رمز جدید</span>`;
+            if (!regex.test(confirmPassword.value)) {
+                passwordInfo.innerHTML = `<span style="color:red">فقط کاراکتر انگلیسی و اعداد انگلیسی مجاز و طول رشته هم حداقل هشت کاراکتر باشد</span>`;
+                confirmPassword.focus();
+                confirmPassowrd.select();
+                return;
             }
 
-            passwordUpdateAction = setTimeout(() => {
-                if (!value) {
-                    return;
-                }
-                if (oldPasswordInputValue !== value) {
-                    oldPasswordInputValue = value;
+            if (password.value.trim() !== confirmPassword.value.trim()) {
+                passwordInfo.innerHTML = `<span style="color:red">مقدار دو فیلد یکی نیست</span>`;
+            }
 
-                    passwordInput.disabled = true;
+            const formData = new FormData(this);
 
-                    updatePasswordAction(oldPasswordInputValue);
-                } else {
-                    passwordInfo.innerHTML = "";
-                }
-            }, 1000)
+            updatePasswordAction(formData, this.action)
+
+            this.reset();
+
+            btn.style.display = "none";
         });
 
-        function updatePasswordAction(passwordValue) {
-            let urlUpdate = passwordInput.dataset.url;
 
-            console.log(urlUpdate);
-
-            let url = new URL(urlUpdate);
-            let id = passwordInput.dataset.id;
-
-            url.searchParams.set('id', id);
-            url.searchParams.set('password', passwordValue);
-
+        function updatePasswordAction(data, href) {
             try {
+                passwordInfo.innerHTML = `<span style="color:blue">در حال به روز رسانی پسورد</span>`;
                 const xhr = new XMLHttpRequest();
 
-                xhr.open('GET', url.href);
+                xhr.open('POST', href);
 
                 xhr.addEventListener('load', function () {
                     if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
                         let res = JSON.parse(xhr.responseText);
+
+                        console.log(res);
 
                         if (res.status == 'error') {
                             passwordInfo.innerHTML = `<span style="color:red">${res.message}</span>`;
@@ -431,14 +436,14 @@
                             passwordInfo.innerHTML = `<span style="color:green">${res.message}</span>`;
                         }
 
-                        passwordInput.disabled = false;
                         setTimeout(() => passwordInfo.innerHTML = '', 5000);
+                        btn.style.display = "block";
                     } else {
                         console.log(xhr.status);
                     }
                 });
 
-                xhr.send();
+                xhr.send(data);
             } catch (e) {
                 console.log(e.message);
             }
@@ -446,4 +451,5 @@
 
     </script>
 </body>
+
 </html>

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
@@ -87,67 +88,33 @@ class UserController extends Controller
         }
     }
 
-    public function updateOwnPassword(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'id'       => 'required|exists:users,id',
-                'password' => 'required|min:8',
-            ]);
-
-            if ($validator->fails()) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'اطلاعات وارد شده درست نمیباشد',
-                ]);
-            }
-
-            $user = User::find($request->id);
-
-            if (Gate::denies('canUpdatePassword', $user)) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'شما دسترسی ندارید به تغییر رمز کاربر',
-                ]);
-            }
-
-            $user->password = $request->password;
-
-            $user->save();
-
-            return response()->json([
-                'status'  => 'success',
-                'message' => 'رمز با موفقیت به روز رسانی شد'
-            ]);
-        } catch (Exception $e) {
-            Log::error('خطایی رخ داده در گرفتن کاربر');
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'خطایی در به روز رسانی پیش آمده'
-            ]);
-        }
-    }
-
     public function updatePassword(Request $request)
     {
         try {
+            $user = User::find($request->id);
+
+            if (!$user) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'کاربری یافت نشد',
+                ]);
+            }
+
             $validator = Validator::make($request->all(), [
-                'id'       => 'required|exists:users,id',
-                'password' => 'required|min:8',
+                'id' => 'required|exists:users,id',
+                'password' => ['required', 'confirmed', Password::min(8)],
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'رمز شما معتبر نیست یا تعداد کاراکتر آن کمتر از ۸ رقم است',
+                    'message' => 'اطلاعات وارد شده درست نمیباشد',
                 ]);
             }
 
-            $user = User::find($request->id);
-
             if (Gate::denies('canUpdatePassword', $user)) {
                 return response()->json([
-                    'status'  => 'error',
+                    'status' => 'error',
                     'message' => 'شما دسترسی ندارید به تغییر رمز کاربر',
                 ]);
             }
@@ -157,29 +124,37 @@ class UserController extends Controller
             $user->save();
 
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => 'رمز با موفقیت به روز رسانی شد'
             ]);
         } catch (Exception $e) {
-            Log::error('خطایی رخ داده در گرفتن کاربر');
+            Log::error('خطایی در گرفتن کاربر یا به روز رسانی رمز پیش آمده: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطایی در به روز رسانی پیش آمده'
+            ]);
         }
     }
 
     public function search(Request $request)
     {
         try {
-            $users = User::query()->whereAny(['username', 'name'], 'like', addcslashes($request->search, '%_') . '%')->latest()->get();
+            $users = User::query()->whereAny(
+                ['username', 'name'],
+                'like',
+                addcslashes($request->search, '%_') . '%'
+            )->latest()->limit(20)->get();
 
             return response()->json([
-                'status'  => 'success',
+                'status' => 'success',
                 'message' => $users->count() === 0 ? 'کاربری با این مشخصات یافت نشد' : 'اطلاعات با موفقیت دریافت شد',
-                'users'   => $users,
-            ]);
+                'users' => $users,
+            ], status: 200);
         } catch (Exception $e) {
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'خطایی هنگام جستجو رخ داده است'
-            ]);
+            ], 500);
         }
     }
 
@@ -253,6 +228,15 @@ class UserController extends Controller
         try {
             $user = User::find($request->id);
 
+            if (!$user) { // User not successfully retrieved
+                return response()->json([
+                    'type' => 'error',
+                    'message' => 'در گرفتن کاربر خطایی رخ داده'
+                ]);
+            }
+
+            $oldProfilePath = $user->profile;
+
             if ($request->action === 'upload') {
                 $validator = Validator::make($request->all(), [
                     'avatar' => 'required|file|mimes:png,jpg,pdf|max:1024'
@@ -260,37 +244,46 @@ class UserController extends Controller
 
                 if ($validator->fails()) {
                     return response()->json([
-                        'status'  => 'error',
-                        'message' => 'حجم بالاس یا فرمت اشتبا' 
+                        'status' => 'error',
+                        'message' => 'حجم بالاس یا فرمت اشتبا'
                     ]);
                 }
 
-                $path    = $request->avatar->store('avatar');
+                $path = $request->avatar->store('avatar');
                 $message = 'آپلود شد :)';
             } else {
-                $path    = 'avatar_def/user-icon.png';
+                $path = 'avatar_def/user-icon.png';
                 $message = 'حذف شد :(';
-            }
-
-            if (!is_null($user->profile) && $user->profile !== 'avatar_def/user-icon.png') {
-                if (Storage::exists($user->profile)) {
-                    Storage::delete($user->profile);
-                }
             }
 
             $user->profile = $path;
 
             $user->save();
 
+            // Check image proifle uploaded successfully or no
+            if ($user->save()) {
+                if (
+                    $oldProfilePath !== 'avatar_def/user-icon.png' &&
+                    Storage::exists($oldProfilePath)
+                ) { // Delete old image if update successfully
+                    Storage::delete($oldProfilePath);
+                }
+            } else if ( // Delete new image if user not updated
+                $path !== 'avatar_def/user-icon.png' &&
+                Storage::exists($path)
+            ) {
+                Storage::delete($path);
+            }
+
             return response()->json([
-                'status'  => 'success',
-                'path'    => $path,
+                'status' => 'success',
+                'path' => $path,
                 'message' => $message
             ]);
         } catch (Exception $e) {
             Log::error('خطایی هنگام آپلود تصویر پیش آمده : ' . $e->getMessage());
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'آپلود نشد :('
             ]);
         }
@@ -301,13 +294,13 @@ class UserController extends Controller
         try {
             return response()->json([
                 'status' => 'success',
-                'path'   => User::find($request->id)->profile,
+                'path' => User::find($request->id)->profile,
             ]);
         } catch (Exception $e) {
             Log::error('خطایی در گرفتن تصویر کاربر پیش آمده : ' . $e->getMessage());
 
             return response()->json([
-                'status'  => 'error',
+                'status' => 'error',
                 'message' => 'خطایی در گرفتن تصیویر پیش آمده'
             ]);
         }
